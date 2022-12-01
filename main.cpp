@@ -3,6 +3,9 @@
 #include <math.h>
 #include "./Assert.h"
 
+char* SkipSpaces(char* str);
+int AnalyzeProgrammCode(char* programm_code, char* programm_code_analyzed);
+
 double GetG(const char* str); // Считывание всего выражения
 double GetE();                // Считывание операций +, -
 double GetT();                // Считывание операций *, /
@@ -10,16 +13,56 @@ double GetD();                // Считывание операции ^
 double GetP();                // Считывание выражений в скобочках (...)
 double GetN();                // Считывание неотрицательных целых чисел
 
-const char* S = nullptr;
+const char* S   = nullptr;
 
 int main()
 {
     FILE* file = fopen("main.txt", "r");
 
-    char s[100] = {};
-    fscanf(file, "%[^\n]s", s);
+    char programm_code[100] = {};
 
-    fprintf(stdout, "значение выражения: %lf\n", GetG(s));
+    char* programm_code_ptr = programm_code;
+    fscanf(file, "%[^EOF]s", programm_code_ptr);
+
+    fclose(file);
+
+    char programm_code_analyzed[100] = {};
+
+    AnalyzeProgrammCode(programm_code, programm_code_analyzed);
+
+    fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
+    fprintf(stdout, "значение выражения: %lf\n", GetG(programm_code_analyzed));
+
+    return 1;
+}
+
+char* SkipSpaces(char* str)
+{
+    while ((*str == ' ') || (*str == '\n'))
+    {
+        // fprintf(stdout, "skip\n");
+        str++;
+    }
+
+    return str;
+}
+
+int AnalyzeProgrammCode(char* programm_code, char* programm_code_analyzed)
+{
+    size_t i = 0;
+
+    while (*programm_code)
+    {
+        if ((*programm_code == ' ') || (*programm_code == '\n'))
+        {
+            programm_code = SkipSpaces(programm_code);
+            // fprintf(stdout, "HERE");
+        }
+
+        programm_code_analyzed[i++] = *(programm_code++);
+
+        // fprintf(stdout, ". %c\n", *(programm_code++));
+    }
 
     return 1;
 }
