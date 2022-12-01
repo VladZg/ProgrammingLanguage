@@ -4,6 +4,7 @@
 #include "./Config.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "./Constants.h"
 
 struct Node
 {
@@ -34,7 +35,7 @@ struct ExpressionVar
 
 int NodeVerify (const Node* node);
 int NodeCtor   (Node* node, enum TreeDataType val_type, double num_val, const char* var_val, enum Operators op_val);
-int NodeDtor   (Node* node);
+int NodeDtor   (Node** node);
 int NodeConnect(Node* left, Node* right, Node* root);
 
 Node* CreateNode(enum TreeDataType val_type, double num_val, const char* var_val, enum Operators op_val, Node* left, Node* right);

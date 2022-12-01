@@ -12,8 +12,10 @@ int main() //const int argc, const char** argv
 
     // -fsanitize=leak
     // -pedantic
+    // -Wall -fsanitize=leak -O0
+    // ./Differentiation.cpp
 
-    system("g++ -Wall -fsanitize=leak -O0 -g ./main.cpp ./Stack/Stack.cpp ./Stack/Log.cpp ./Tree.cpp ./TreeDump.cpp ./ReadAndWriteFunctions.cpp ./Differentiation.cpp -o main");
+    system("g++ -g -fsanitize=leak ./main.cpp ./Stack/Stack.cpp ./Stack/Log.cpp ./Tree.cpp ./TreeDump.cpp ./ReadAndWriteFunctions.cpp ./SyntaxAnalyzator.cpp ./LexicalAnalyzator.cpp -o main");
 
     char cmd[100] = "./main";
 

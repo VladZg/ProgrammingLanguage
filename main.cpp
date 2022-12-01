@@ -1,19 +1,21 @@
+#include "./Config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "./Assert.h"
+#include <sys/stat.h>
+#include <cstdio>
+#include <cstring>
+#include "./Constants.h"
+#include "./DefineColourConsts.h"
+#include "./Stack/Assert.h"
+#include "./Stack/Stack.h"
+#include "./Tree.h"
+#include "./TreeDump.h"
+#include "./ReadAndWriteFunctions.h"
+#include "./DiffDSL.h"
 
-char* SkipSpaces(char* str);
-int AnalyzeProgrammCode(char* programm_code, char* programm_code_analyzed);
-
-double GetG(const char* str); // Считывание всего выражения
-double GetE();                // Считывание операций +, -
-double GetT();                // Считывание операций *, /
-double GetD();                // Считывание операции ^
-double GetP();                // Считывание выражений в скобочках (...)
-double GetN();                // Считывание неотрицательных целых чисел
-
-const char* S   = nullptr;
+#include "./LexicalAnalyzator.h"
+#include "./SyntaxAnalyzator.h"
 
 int main()
 {
@@ -31,151 +33,19 @@ int main()
     AnalyzeProgrammCode(programm_code, programm_code_analyzed);
 
     fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
-    fprintf(stdout, "значение выражения: %lf\n", GetG(programm_code_analyzed));
+
+    Node* root = GetG(programm_code_analyzed);
+
+    ShowTree(root, SIMPLE_DUMP_MODE, 0);
+
+    CalculateConstantSubtrees(root);
+    // TreeInorderPrint(root, stdout);
+
+    ShowTree(root, SIMPLE_DUMP_MODE, 0);
+
+    fprintf(stdout, "Значение выражения: %lf\n", root->num_val);
+
+    NodeDtor(&root);
 
     return 1;
-}
-
-char* SkipSpaces(char* str)
-{
-    while ((*str == ' ') || (*str == '\n'))
-    {
-        // fprintf(stdout, "skip\n");
-        str++;
-    }
-
-    return str;
-}
-
-int AnalyzeProgrammCode(char* programm_code, char* programm_code_analyzed)
-{
-    size_t i = 0;
-
-    while (*programm_code)
-    {
-        if ((*programm_code == ' ') || (*programm_code == '\n'))
-        {
-            programm_code = SkipSpaces(programm_code);
-            // fprintf(stdout, "HERE");
-        }
-
-        programm_code_analyzed[i++] = *(programm_code++);
-
-        // fprintf(stdout, ". %c\n", *(programm_code++));
-    }
-
-    return 1;
-}
-
-double GetG(const char* str)
-{
-    ASSERT(str != nullptr);
-
-    S = str;
-
-    double val = GetE();
-
-    ASSERT(*S == '\0');
-
-    return val;
-}
-
-double GetE()
-{
-    double val = GetT();
-
-    while (*S == '+' || *S == '-')
-    {
-        char op = *S;
-
-        S++;
-
-        double val2 = GetT();
-
-        if (op == '+')
-            val += val2;
-
-        else
-            val -= val2;
-    }
-
-    return val;
-}
-
-double GetT()
-{
-    double val = GetD();
-
-    while (*S == '*' || *S == '/')
-    {
-        char op = *S;
-
-        S++;
-
-        double val2 = GetD();
-
-        if (op == '*')
-            val *= val2;
-
-        else
-            val /= val2;
-    }
-
-    return val;
-}
-
-double GetD()
-{
-    double val = GetP();
-
-    while (*S == '^')
-    {
-        char op = *S;
-
-        S++;
-
-        double val2 = GetP();
-
-        val = pow(val, val2);
-    }
-
-    return val;
-}
-
-double GetP()
-{
-    double val = 0;
-
-    if (*S == '(')
-    {
-        S++;
-
-        val = GetE();
-
-        ASSERT(*S == ')');
-
-        S++;
-    }
-
-    else
-        val = GetN();
-
-    return val;
-}
-
-double GetN()
-{
-    double val = 0;
-
-    const char* s_old = S;
-
-    while ('0' <= *S && *S <= '9')
-    {
-        val = val * 10 + (*S - '0');
-        S++;
-    }
-
-    ASSERT(S > s_old);
-
-    return val;
 }
