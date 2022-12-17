@@ -39,7 +39,7 @@ size_t Database_format_shift = 0;
 //     return 1;
 // }
 
-int ReadNodeVal(char* node_val, enum TreeDataType* val_type, enum Operators* op_val, double* num_val, const char** var_val)
+int ReadNodeVal(const char* node_val, enum TreeDataType* val_type, enum Operators* op_val, double* num_val, const char** var_val)
 {
     if (IsVar(node_val))
     {
@@ -58,7 +58,7 @@ int ReadNodeVal(char* node_val, enum TreeDataType* val_type, enum Operators* op_
         *val_type = OP_TYPE;
         *op_val = op_val_temp;
 
-        free(node_val);
+        free((void*) node_val);
 
         return 1;
     }
@@ -70,7 +70,7 @@ int ReadNodeVal(char* node_val, enum TreeDataType* val_type, enum Operators* op_
         *val_type = NUM_TYPE;
         *num_val = num_val_temp;
 
-        free(node_val);
+        free((void*) node_val);
 
         return 1;
     }

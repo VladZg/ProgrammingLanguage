@@ -33,7 +33,9 @@ struct ExpressionVar
     double value;
 };
 
-int NodeVerify (const Node* node);
+void WarningMessage(const char* function_name, const char* fmt_msg, ...);
+
+int NodeVerify (const char* function_name, const Node* node);
 int NodeCtor   (Node* node, enum TreeDataType val_type, double num_val, const char* var_val, enum Operators op_val);
 int NodeDtor   (Node** node);
 int NodeConnect(Node* left, Node* right, Node* root);
@@ -43,11 +45,13 @@ Node* CopyNode(const Node* node);
 Node* CalculateConstantSubtrees(Node* node);
 Node* DestroyNeutralTreeElements(Node* node);
 Node* SimplifyTree(Node** node);
-int IsVarsInTree(Node* node);
+int IsVarsInTree(const Node* node);
 
 int TreeVerify(const Tree* tree);
 int TreeCtor  (Tree* tree);
 int TreeDtor  (Tree* tree);
+size_t TreeDepth(const Node* node);
+size_t TreeNumberOfNodes(const Node* node);
 
 enum Operators IsOperator(const char* node_val);
 int IsVar(const char* node_val);
@@ -66,8 +70,8 @@ void TreePostorderPrint(const Node* node, FILE* stream);
 #define VERIFY_TREE( tree_ptr )     \
     if (!TreeVerify(tree_ptr)) return 0;
 
-#define VERIFY_NODE( node_ptr )     \
-    if (!NodeVerify(node_ptr)) return 0;
+#define VERIFY_NODE( node_ptr ) NodeVerify(__PRETTY_FUNCTION__, node_ptr)
+
 
 #else
 

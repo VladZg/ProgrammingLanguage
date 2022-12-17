@@ -11,41 +11,54 @@
 #include "./Stack/Stack.h"
 #include "./Tree.h"
 #include "./TreeDump.h"
-#include "./ReadAndWriteFunctions.h"
+// #include "./ReadAndWriteFunctions.h"
 #include "./DiffDSL.h"
 
-#include "./LexicalAnalyzator.h"
-#include "./SyntaxAnalyzator.h"
+#include "./FrontEnd/LexicalAnalyzator.h"
+#include "./FrontEnd/SyntaxAnalyzator.h"
+#include "./BackEnd.h"
 
 int main()
 {
-    FILE* file = fopen("main.txt", "r");
+    FILE* file = fopen("./programm.vlds", "r");
 
-    char programm_code[100] = {};
+    char programm_code[MAX_PROGRAMM_LENGTH] = {};
 
     char* programm_code_ptr = programm_code;
     fscanf(file, "%[^EOF]s", programm_code_ptr);
 
+    // fprintf(stdout, "%s", programm_code_ptr);
+
     fclose(file);
 
-    char programm_code_analyzed[100] = {};
+    ProgrammTokens* programm_tokens = ProgrammTokensCtor();
 
-    AnalyzeProgrammCode(programm_code, programm_code_analyzed);
+    AnalyzeProgrammCode(programm_tokens, programm_code);
 
-    fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
+    ProgrammTokensDump(programm_tokens);
 
-    Node* root = GetG(programm_code_analyzed);
+    // fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
 
-    ShowTree(root, SIMPLE_DUMP_MODE, 0);
+    // Node* root = GetG(&programm_tokens, programm_code_analyzed);
 
-    CalculateConstantSubtrees(root);
+    // ShowTree(root, SIMPLE_DUMP_MODE, 1);
+
+    // CalculateConstantSubtrees(root);
     // TreeInorderPrint(root, stdout);
 
-    ShowTree(root, SIMPLE_DUMP_MODE, 0);
+    // ShowTree(root, FULL_FULL_DUMP_MODE, 1);
 
-    fprintf(stdout, "Значение выражения: %lf\n", root->num_val);
+    // fprintf(stdout, "Значение выражения: %lf\n", root->num_val);
 
-    NodeDtor(&root);
+    // ProgrammTokensDump(&programm_tokens);
+    // fprintf(stdout, "\n");
+
+    // ProcessProgramm(root);
+
+    // fprintf(stderr, "%f %f %d\n", (float) 5, (float) 2, (int) pow(5, 2));
+
+    ProgrammTokensDtor(&programm_tokens);
+    // NodeDtor(&root);
 
     return 1;
 }

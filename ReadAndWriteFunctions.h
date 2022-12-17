@@ -6,7 +6,7 @@ struct ExpressionParams
     ExpressionVar* vars;
 };
 
-int ReadNodeVal(char* node_val, enum TreeDataType* val_type, enum Operators* op_val, double* num_val, const char** var_val);
+int ReadNodeVal(const char* node_val, enum TreeDataType* val_type, enum Operators* op_val, double* num_val, const char** var_val);
 
 // int   ReadDatabaseName   (FILE* database_file, char* database_name);
 Node* ReadExpressionToTree (FILE* database_file, Tree* tree);

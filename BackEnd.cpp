@@ -6,7 +6,7 @@
 #include "./DefineColourConsts.h"
 #include "./Stack/Assert.h"
 #include "./Tree.h"
-#include "./LexicalAnalyzator.h"
+#include "./FrontEnd/LexicalAnalyzator.h"
 #include "./BackEnd.h"
 
 int ProcessProgramm(Node* node)

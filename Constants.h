@@ -6,40 +6,64 @@
 
 enum Constants
 {
-    MAX_NODE_VAL_LEN = 10,
+    MAX_NODE_VAL_LEN    = 10,
+    MAX_PROGRAMM_LENGTH = 500,
 };
 
-enum TreeDataType
+#define DEF_KEY(key_code, key_name, key_lang_name) \
+    KEY_##key_name = key_code,
+
+enum KeyWords
 {
-    NULL_TYPE = 0,
-    NUM_TYPE ,
-    VAR_TYPE ,
-    OP_TYPE  ,
+    NOT_KEY = 0,
+    #include "./Dictionary/KeyWords.h"
 };
+
+#undef DEF_KEY
+
+#define DEF_SEP(sep_code, sep_name, sep_lang_name) \
+    SEP_##sep_name = sep_code,
+
+enum Separators
+{
+    NOT_SEP = 0,
+    #include "./Dictionary/Separators.h"
+};
+
+#undef DEF_SEP
+
+#define DEF_OP(op_code, op_name, op_lang_name) \
+    OP_##op_name = op_code,
 
 enum Operators
 {
-    NULL_OP = 0,
-    OP_ADD     ,
-    OP_SUB     ,
-    OP_MUL     ,
-    OP_DIV     ,
-    OP_DEG     ,
-    OP_EXP     ,
-    OP_SQRT    ,
-    // OP_RT      ,
-    OP_LOG     ,
-    OP_LN      ,
-    OP_SIN     ,
-    OP_COS     ,
-    OP_TG      ,
-    OP_CTG     ,
-    OP_SH      ,
-    OP_CH      ,
-    OP_ARCSIN  ,
-    OP_ARCCOS  ,
-    OP_ARCTG   ,
-    OP_ARCCTG  ,
+    NOT_OP = 0,
+    #include "./Dictionary/Operators.h"
+};
+
+#undef DEF_OP
+
+enum VarConstants
+{
+    VAR_DEAD_VAL = 193726,
+};
+
+enum TokenDataType
+{
+    TOKEN_NULL_TYPE = 0,
+
+    TOKEN_KEY_TYPE     ,
+    TOKEN_OP_TYPE      ,
+    TOKEN_SEP_TYPE     ,
+    TOKEN_VAR_TYPE     ,
+    TOKEN_NUM_TYPE     ,
+
+    TOKEN_END_TYPE     ,
+};
+
+enum TokenConstants
+{
+    NOT_NUM = 872364,
 };
 
 enum OpTexPrintModes
@@ -49,7 +73,15 @@ enum OpTexPrintModes
     OP_TEX_INPRINT          ,
 };
 
-enum DumpModes
+enum TreeDataType
+{
+    NULL_TYPE = 0,
+    NUM_TYPE     ,
+    VAR_TYPE     ,
+    OP_TYPE      ,
+};
+
+enum TreeDumpModes
 {
     SIMPLE_DUMP_MODE   ,
     FULL_FULL_DUMP_MODE,

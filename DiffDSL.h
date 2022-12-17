@@ -7,8 +7,9 @@
 #define CL CopyNode(node->left)
 #define CR CopyNode(node->right)
 
-#define CREATE_NUM(num)                CreateNode(NUM_TYPE, num, nullptr, NULL_OP, nullptr, nullptr)
-#define CREATE_OP(op_val, left, right) CreateNode(OP_TYPE,  0  , nullptr, op_val , left,    right)
+#define CREATE_NUM(num)                CreateNode(NUM_TYPE, num, nullptr , NULL_OP, nullptr, nullptr)
+#define CREATE_OP(op_val, left, right) CreateNode(OP_TYPE,  0  , nullptr , op_val , left   , right  )
+#define CREATE_VAR(var_name)           CreateNode(VAR_TYPE, 0  , var_name, NULL_OP, nullptr, nullptr)
 
 #define ADD( left, right) CREATE_OP(OP_ADD , left         , right)
 #define SUB( left, right) CREATE_OP(OP_SUB , left         , right)
