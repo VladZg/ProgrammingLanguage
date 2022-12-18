@@ -1,8 +1,8 @@
 #include "../Config.h"
 #include <stdlib.h>
 #include <ctype.h>
-#include "../Constants.h"
-#include "../Stack/Assert.h"
+#include "../Constants/Constants.h"
+#include "../Assert.h"
 #include "./LexicalAnalyzator.h"
 
 Var VarCtor(Var* var, const char* name, double value)
@@ -29,7 +29,7 @@ int VarDtor(Var* var)
     return 1;
 }
 
-Token* TokenCtor(TokenDataType val_type, TokenValue value)
+Token* TokenCtor(TokenDataType val_type, Value value)
 {
     Token* token = (Token*) calloc(1, sizeof(Token));
     ASSERT(token != nullptr);
@@ -310,7 +310,7 @@ Operators CheckForOperator(char* programm_code, size_t* i_letter)
     // fprintf(stdout, "1: %s\n", programm_code_ptr);
     // fprintf(stdout, "до: %ld\n", *i_letter);
 
-    char* lexema_name = strtok(programm_code, " \n\0"); //0123456789(){}[]&%@!$_\\|~`'\"<>?.,#№");
+    char* lexema_name = strtok(programm_code, " \n"); //0123456789(){}[]&%@!$_\\|~`'\"<>?.,#№");
 
     #include "../Dictionary/Operators.h"
 
@@ -349,7 +349,7 @@ KeyWords CheckForKeyWord(char* programm_code, size_t* i_letter)
 
     KeyWords key_val = NOT_KEY;
 
-    char* lexema_name = strtok(programm_code, " \0\n"); //0123456789+-=/^(){}[]&%@!$_\\|~`'\"<>?.,#№;");
+    char* lexema_name = strtok(programm_code, " \n"); //0123456789+-=/^(){}[]&%@!$_\\|~`'\"<>?.,#№;");
 
     #include "../Dictionary/KeyWords.h"
 
@@ -388,7 +388,7 @@ Separators CheckForSeparator(char* programm_code, size_t* i_letter)
     // char* next_str = strpbrk(programm_code, " \0\n0123456789+-=/^&%@!$_\\|~`'\"<>?#№abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
     // if (next_str) fprintf(stderr, "tut: %c\n", *next_str);
 
-    char* lexema_name = strtok(programm_code, " \n\0"); //0123456789+-=/^&%@!$_\\|~`'\"<>?#№abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    char* lexema_name = strtok(programm_code, " \n"); //0123456789+-=/^&%@!$_\\|~`'\"<>?#№abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
     // fprintf(stdout, ".%s.\n", lexema_name);
 
@@ -439,12 +439,11 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
     size_t max_programm_length = strlen(programm_code_copy);
 
     size_t i_letter = 0;
+    Value token_value = {};
 
     while (programm_code_copy[i_letter] != '\0' && i_letter < max_programm_length)
     {
         SkipSpaces(&programm_code_copy[i_letter], &i_letter);
-
-        TokenValue token_value = {};
 
         token_value.num_val = CheckForNum(&programm_code_copy[i_letter], &i_letter);
 
@@ -487,14 +486,16 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
             continue;
         }
 
-        if (CheckForEnd(&programm_code_copy[i_letter], &i_letter))
-        {
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_END_TYPE, token_value);
-            break;
-        }
+        break;
+    }
+
+    if (CheckForEnd(&programm_code_copy[i_letter], &i_letter))
+    {
+        CUR_TOKEN_NEXT = TokenCtor(TOKEN_END_TYPE, token_value);
     }
 
     programm_tokens->tokens = (Token**) realloc(programm_tokens->tokens, programm_tokens->size * sizeof(Token*));
+    ASSERT(programm_tokens->tokens != nullptr)
 
     // if (programm_tokens->size != 0) programm_tokens->cursor = 1;
 

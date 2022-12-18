@@ -16,7 +16,7 @@ enum Constants
 enum KeyWords
 {
     NOT_KEY = 0,
-    #include "./Dictionary/KeyWords.h"
+    #include "../Dictionary/KeyWords.h"
 };
 
 #undef DEF_KEY
@@ -27,7 +27,7 @@ enum KeyWords
 enum Separators
 {
     NOT_SEP = 0,
-    #include "./Dictionary/Separators.h"
+    #include "../Dictionary/Separators.h"
 };
 
 #undef DEF_SEP
@@ -38,14 +38,36 @@ enum Separators
 enum Operators
 {
     NOT_OP = 0,
-    #include "./Dictionary/Operators.h"
+    #include "../Dictionary/Operators.h"
 };
 
 #undef DEF_OP
 
+enum Functions
+{
+    NOT_FUNC = 0,
+};
+
+typedef double Var_val;
+
+struct Var
+{
+    char*   name ;
+    Var_val value;
+};
+
 enum VarConstants
 {
     VAR_DEAD_VAL = 193726,
+};
+
+union Value
+{
+    KeyWords   key_val;
+    Operators  op_val ;
+    Separators sep_val;
+    Var        var    ;
+    double     num_val;
 };
 
 enum TokenDataType
@@ -73,12 +95,16 @@ enum OpTexPrintModes
     OP_TEX_INPRINT          ,
 };
 
-enum TreeDataType
+enum NodeDataType
 {
-    NULL_TYPE = 0,
-    NUM_TYPE     ,
-    VAR_TYPE     ,
-    OP_TYPE      ,
+    NODE_NULL_TYPE = 0,
+
+    NODE_NUM_TYPE     ,
+    NODE_VAR_TYPE     ,
+    NODE_OP_TYPE      ,
+    NODE_KEY_TYPE     ,
+    NODE_SEP_TYPE     ,
+    NODE_FUNC_TYPE    ,
 };
 
 enum TreeDumpModes

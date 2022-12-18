@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 // #include "./DefineColourConsts.h"
-#include "./ColourConsts.h"
+#include "./Constants/ColourConsts.h"
 
 //! @brief Макрос, печатающий сообщение об ошибке в заданном условии, если оно неверно
 //! @param[in] condition Проверяемое условие

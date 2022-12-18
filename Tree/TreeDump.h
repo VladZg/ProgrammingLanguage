@@ -1,10 +1,10 @@
 #ifndef TREEDUMP_H
 #define TREEDUMP_H
 
-#include "./Config.h"
+#include "../Config.h"
 #include <stdlib.h>
-#include "./Constants.h"
-#include "./DefineColourConsts.h"
+#include "../Constants/Constants.h"
+#include "../Constants/DefineColourConsts.h"
 #include "./Tree.h"
 
 int TreeFullDotDump       (const Node* node, FILE* dot_file, enum TreeDumpModes dump_mode);

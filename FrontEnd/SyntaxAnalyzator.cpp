@@ -1,15 +1,39 @@
 #include "../Config.h"
 #include <stdlib.h>
-#include "../DefineColourConsts.h"
-#include "../Stack/Assert.h"
-#include "../Constants.h"
-#include "../Tree.h"
+#include "../Constants/DefineColourConsts.h"
+#include "../Assert.h"
+#include "../Constants/Constants.h"
+#include "../Tree/Tree.h"
+#include "../Tree/TreeDump.h"
 #include "./LexicalAnalyzator.h"
 #include "./SyntaxAnalyzator.h"
 
 #define CUR_TOKEN programm_tokens->tokens[programm_tokens->cursor]
+#define VAL_TYPE CUR_TOKEN->val_type
+#define VAL_NUM  CUR_TOKEN->value.num_val
+#define VAL_OP   CUR_TOKEN->value.op_val
+#define VAL_KEY  CUR_TOKEN->value.key_val
+#define VAL_SEP  CUR_TOKEN->value.sep_val
+#define VAL_VAR  CUR_TOKEN->value.var
 
-const char* S   = nullptr;
+#define CREATE_OP( op_code, left, right )                    \
+    {                                                        \
+        Value value = {};                                    \
+        value.op_val = op_code;                              \
+                                                             \
+        node = CreateNode(NODE_OP_TYPE, value, left, right); \
+    }
+
+#define ADD( left, right ) CREATE_OP(OP_ADD,  left, right)
+#define SUB( left, right ) CREATE_OP(OP_SUB,  left, right)
+#define MUL( left, right ) CREATE_OP(OP_MUL,  left, right)
+#define DIV( left, right ) CREATE_OP(OP_DIV,  left, right)
+#define DEG( left, right ) CREATE_OP(OP_DEG,  left, right)
+#define SQRT(left, right ) CREATE_OP(OP_SQRT, left, right)
+#define SIN( left, right ) CREATE_OP(OP_SIN,  left, right)
+#define COS( left, right ) CREATE_OP(OP_COS,  left, right)
+#define LN(  left, right ) CREATE_OP(OP_LN,   left, right)
+#define EQ(  left, right ) CREATE_OP(OP_EQ,   left, right)
 
 void SyntaxErrorPrint(size_t token_cursor, Token* token)
 {
@@ -17,222 +41,253 @@ void SyntaxErrorPrint(size_t token_cursor, Token* token)
     exit(1);
 }
 
-Node* GetG(ProgrammTokens* programm_tokens, const char* str)
+Node* GetProgramm(ProgrammTokens* programm_tokens)
 {
-//     ASSERT(str != nullptr);
-//
-//     S = str;
-//
-//     // ProgrammTokensDump(programm_tokens);
-//
-    Node* node = GetE(programm_tokens);
-//
-//     ASSERT(*S == '\0');
+    Node* node = GetExpression(programm_tokens);
 
-    if (!(CUR_TOKEN->val_type == OP_TYPE) ||
-        !(CUR_TOKEN->op_val   == OP_END )   )
+    if (!(VAL_TYPE == TOKEN_END_TYPE))
         SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
 
     programm_tokens->cursor = 0;
 
-    return node;
-}
-
-Node* GetE(ProgrammTokens* programm_tokens)
-{
     // ProgrammTokensDump(programm_tokens);
 
-//     Node* node = GetN(programm_tokens);
-//
-//     while (*S == '+' || *S == '-')
-//     {
-//         char op = *S;
-//
-//         S++;
+    return node;
+}
 
-//         Node* left_node  = node;
-//         Node* right_node = GetN(programm_tokens);
-//
-//         if (op == '+')
-//             node = ADD(left_node, right_node);
-//
-//         else
-//             node = SUB(left_node, right_node);
-    // }
+Node* GetExpression(ProgrammTokens* programm_tokens)
+{
+    Node* node = GetMultiplication(programm_tokens);
 
-    Node* node = GetT(programm_tokens);
-
-    while (CUR_TOKEN->val_type == OP_TYPE &&
-          (CUR_TOKEN->op_val == OP_ADD || CUR_TOKEN->op_val == OP_SUB))
+    while (VAL_TYPE == TOKEN_OP_TYPE &&
+          (VAL_OP == OP_ADD || VAL_OP == OP_SUB))
     {
-        int op_val = CUR_TOKEN->op_val;
+        Operators op_code = VAL_OP;
 
         programm_tokens->cursor++;
 
         // ProgrammTokensDump(programm_tokens);
 
         Node* left_node  = node;
-        Node* right_node = GetT(programm_tokens);
+        Node* right_node = GetMultiplication(programm_tokens);
 
-        if (op_val == OP_ADD)
-            node = ADD(left_node, right_node);
+        if (op_code == OP_ADD)
+            ADD(left_node, right_node)
 
         else
-            node = SUB(left_node, right_node);
+            SUB(left_node, right_node)
     }
 
     return node;
 }
 
-Node* GetT(ProgrammTokens* programm_tokens)
+Node* GetMultiplication(ProgrammTokens* programm_tokens)
 {
-    // Node* node = GetD(programm_tokens);
+    Node* node = GetDegree(programm_tokens);
 
-//     while (*S == '*' || *S == '/')
-//     {
-//         char op = *S;
-//
-//         S++;
-//
-//         Node* left_node  = node;
-//         Node* right_node = GetD(programm_tokens);
-//
-//         if (op == '*')
-//             node = MUL(left_node, right_node);
-//
-//         else
-//             node = DIV(left_node, right_node);
-//     }
-
-
-    Node* node = GetD(programm_tokens);
-
-    while (CUR_TOKEN->val_type == OP_TYPE &&
-          (CUR_TOKEN->op_val == OP_MUL || CUR_TOKEN->op_val == OP_DIV))
+    while (VAL_TYPE == TOKEN_OP_TYPE &&
+          (VAL_OP == OP_MUL || VAL_OP == OP_DIV))
     {
-        int op_val = CUR_TOKEN->op_val;
+        Operators op_code = VAL_OP;
 
         programm_tokens->cursor++;
 
         // ProgrammTokensDump(programm_tokens);
 
         Node* left_node  = node;
-        Node* right_node = GetD(programm_tokens);
+        Node* right_node = GetDegree(programm_tokens);
 
-        if (op_val == OP_MUL)
-            node = MUL(left_node, right_node);
+        if (op_code == OP_MUL)
+            MUL(left_node, right_node)
 
         else
-            node = DIV(left_node, right_node);
+            DIV(left_node, right_node)
     }
 
     return node;
 }
 
-Node* GetD(ProgrammTokens* programm_tokens)
+Node* GetDegree(ProgrammTokens* programm_tokens)
 {
-//     Node* node = GetP(programm_tokens);
-//
-//     while (*S == '^')
-//     {
-//         char op = *S;
-//
-//         S++;
-//
-//         Node* left_node  = node;
-//         Node* right_node = GetP(programm_tokens);
-//
-//         node = DEG(left_node, right_node);
-//     }
-//
-//     return node;
+    Node* node = GetPrimaryExpression(programm_tokens);
 
-    Node* node = GetP(programm_tokens);
+    // fprintf(stderr, );
+    // ProgrammTokensDump(programm_tokens);
 
-    while (CUR_TOKEN->val_type == OP_TYPE && CUR_TOKEN->op_val == OP_DEG)
+    while (VAL_TYPE == TOKEN_OP_TYPE &&
+           VAL_OP == OP_DEG            )
     {
         programm_tokens->cursor++;
 
         // ProgrammTokensDump(programm_tokens);
 
         Node* left_node  = node;
-        Node* right_node = GetP(programm_tokens);
+        Node* right_node = GetPrimaryExpression(programm_tokens);
 
-        node = DEG(left_node, right_node);
+        DEG(left_node, right_node)
     }
 
     return node;
 }
 
-Node* GetP(ProgrammTokens* programm_tokens)
+Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 {
     Node* node = nullptr;
 
-//     if (*S == '(')
+    if (VAL_TYPE == TOKEN_SEP_TYPE &&
+        VAL_SEP  == SEP_L_ROUND_BRACKET)
+    {
+        // HERE(1)
+
+        programm_tokens->cursor++;
+
+        node = GetExpression(programm_tokens);
+
+        // TreeInorderPrint(node, stderr);
+
+        // fprintf(stderr, "\n%d\n", VAL_SEP);
+
+        if (VAL_TYPE != TOKEN_SEP_TYPE || VAL_SEP != SEP_R_ROUND_BRACKET)
+            SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
+
+        // ProgrammTokensDump(programm_tokens);
+
+        programm_tokens->cursor++;
+    }
+
+    else if (VAL_TYPE == TOKEN_NUM_TYPE)
+        node = GetNumber(programm_tokens);
+
+    // else
+    //     node = GetW(programm_tokens);
+
+    // ShowTree(node, SIMPLE_DUMP_MODE, 1);
+
+    return node;
+}
+
+// Node* GetW(ProgrammTokens* programm_tokens)
+// {
+//     Node* node = nullptr;
+//     char* name = GetV(expression_str);
+//
+//     if (**expression_str == '(')
 //     {
-//         S++;
+//         (*expression_str)++;
 //
-//         node = GetE(programm_tokens);
+//         Node* arg_node = GetE(expression_str, params);
 //
-//         ASSERT(*S == ')');
+//         // fprintf(stdout, "function name: %s\n", name);
 //
-//         S++;
+//              if (!strcasecmp(name, "exp"   )) node = EXP   (arg_node);
+//         else if (!strcasecmp(name, "sqrt"  )) node = SQRT  (arg_node);
+//         else if (!strcasecmp(name, "ln"    )) node = LN    (arg_node);
+//         else if (!strcasecmp(name, "sin"   )) node = SIN   (arg_node);
+//         else if (!strcasecmp(name, "cos"   )) node = COS   (arg_node);
+//         else if (!strcasecmp(name, "tg"    )) node = TG    (arg_node);
+//         else if (!strcasecmp(name, "ctg"   )) node = CTG   (arg_node);
+//         else if (!strcasecmp(name, "ch"    )) node = CH    (arg_node);
+//         else if (!strcasecmp(name, "sh"    )) node = SH    (arg_node);
+//         else if (!strcasecmp(name, "arcsin")) node = ARCSIN(arg_node);
+//         else if (!strcasecmp(name, "arccos")) node = ARCCOS(arg_node);
+//         else if (!strcasecmp(name, "arctg" )) node = ARCTG (arg_node);
+//         else if (!strcasecmp(name, "arcctg")) node = ARCCTG(arg_node);
+//
+//         free((void*) name);
+//
+//         ASSERT(**expression_str == ')')
+//
+//         (*expression_str)++;
 //     }
 //
 //     else
-//         node = GetN(programm_tokens);
+//     {
+//         if (FindVarIndex(name, params->vars, params->n_vars) == NO_VAR_NAME)
+//         {
+//             char*  new_var_name = (char*) calloc(MAX_VAR_NAME_LEN, sizeof(char));
+//             ASSERT(new_var_name != nullptr);
+//
+//             memcpy(new_var_name, name, MAX_VAR_NAME_LEN);
+//             AddVar(new_var_name, DEFAULT_UNDEFINED_VAR_VALUE, params);
+//         }
+//
+//         node = CREATE_VAR(name);
+//     }
+//
+//     return node;
+// }
+//
+// char* GetVariable(const char** expression_str)
+// {
+//     char* name = (char*) calloc(MAX_VAR_NAME_LEN, sizeof(char));
+//
+//     int i = 0;
+//
+//     while (('A' <= **expression_str && **expression_str <= 'Z') ||
+//            ('a' <= **expression_str && **expression_str <= 'z')   )
+//     {
+//         name[i++] = **expression_str;
+//
+//         (*expression_str)++;
+//     }
+//
+//     return name;
+// }
 
-    if (CUR_TOKEN->val_type == OP_TYPE && CUR_TOKEN->op_val == SEP_L_ROUND_BRACKET)
-    {
-        programm_tokens->cursor++;
-
-        node = GetE(programm_tokens);
-
-        if (CUR_TOKEN->val_type != OP_TYPE || CUR_TOKEN->op_val != SEP_R_ROUND_BRACKET)
-            SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
-
-        programm_tokens->cursor++;
-    }
-
-    else
-        node = GetN(programm_tokens);
+Node* GetWhile(ProgrammTokens* programm_tokens)
+{
+    Node* node = nullptr;
 
     return node;
 }
 
-Node* GetN(ProgrammTokens* programm_tokens)
+Node* GetCondition(ProgrammTokens* programm_tokens)
 {
-//     double val = 0;
-//
-//     const char* s_old = S;
-//
-//     while ('0' <= *S && *S <= '9')
-//     {
-//         val = val * 10 + (*S - '0');
-//         S++;
-//     }
-//
-//     ASSERT(S > s_old);
+    Node* node = nullptr;
 
-    // fprintf(stderr, "%lf\n", val);
+    return node;
+}
 
+Node* GetNumber(ProgrammTokens* programm_tokens)
+{
     Node* node = nullptr;
 
     // ProgrammTokensDump(programm_tokens);
 
-    if (CUR_TOKEN->val_type == NUM_TYPE)
-        node = CREATE_NUM(CUR_TOKEN->num_val);
+    if (VAL_TYPE == TOKEN_NUM_TYPE)
+    {
+        Value value = {};
+        value.num_val = VAL_NUM;
 
-    else if (CUR_TOKEN->val_type == VAR_TYPE)
-        node = CREATE_VAR(CUR_TOKEN->var_val);
+        node = CreateNode(NODE_NUM_TYPE, value, nullptr, nullptr);
+    }
+
+    // else if (CUR_TOKEN->val_type == NODE_VAR_TYPE)
+    //     node = CREATE_VAR(VAL_VAR.name);
 
     else SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
 
     programm_tokens->cursor++;
 
-    return node;
-
-    // return CREATE_NUM(val);
+    return node;;
 }
 
 #undef CUR_TOKEN
+#undef NUM_VAL
+#undef OP_VAL
+#undef KEY_VAL
+#undef SEP_VAL
+#undef VAR_VAL
+
+#undef CREATE_OP
+
+#undef ADD
+#undef SUB
+#undef MUL
+#undef DIV
+#undef DEG
+#undef SQRT
+#undef SIN
+#undef COS
+#undef LN
+#undef EQ

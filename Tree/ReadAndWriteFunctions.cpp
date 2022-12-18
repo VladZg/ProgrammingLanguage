@@ -1,13 +1,13 @@
-#include "./Config.h"
+#include "../Config.h"
 #include <stdio.h>
 #include <string.h>
-#include "./Constants.h"
-#include "./DefineColourConsts.h"
-#include "./Stack/Assert.h"
+#include "../Constants.h"
+#include "../DefineColourConsts.h"
+#include "../Stack/Assert.h"
 #include "./Tree.h"
 #include "./ReadAndWriteFunctions.h"
 
-size_t Database_format_shift = 0;
+size_t Format_shift = 0;
 
 // static void FprintfNSymb(FILE* stream, char symb, size_t n_symb)
 // {
@@ -23,20 +23,6 @@ size_t Database_format_shift = 0;
 //
 //     for (size_t i = 0; i < n; i++)
 //         fgetc(stream);
-// }
-
-// int ReadDatabaseName(FILE* database_file, char* database_name)
-// {
-//     ASSERT(database_file != nullptr);
-//     ASSERT(database_name != nullptr);
-//
-//     fscanf(database_file, " \"%[^\"]s", database_name);
-//     fscanf(database_file, "%*[^\n]s");
-//     fgetc(database_file);
-//     fscanf(database_file, "%*[^\n]s");
-//     fgetc(database_file);
-//
-//     return 1;
 // }
 
 int ReadNodeVal(const char* node_val, enum TreeDataType* val_type, enum Operators* op_val, double* num_val, const char** var_val)
@@ -132,7 +118,7 @@ Node* ReadExpressionToTree(FILE* database_file, Tree* tree)
         fscanf(database_file, "%[^()]s) ", new_node_val);
         // fprintf(stdout, "%s", new_node_val);
 
-        enum TreeDataType val_type = NULL_TYPE;
+        enum NodeDataType val_type = NODE_NULL_TYPE;
         enum Operators op_val      = NULL_OP;
         double num_val             = 0;
         const char* var_val        = nullptr;

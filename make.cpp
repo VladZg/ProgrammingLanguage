@@ -17,7 +17,7 @@ int main() //const int argc, const char** argv
 
     // system("g++ -g -fsanitize=address ./main.cpp ./Stack/Stack.cpp ./Stack/Log.cpp ./Tree.cpp ./TreeDump.cpp ./FrontEnd/SyntaxAnalyzator.cpp ./FrontEnd/LexicalAnalyzator.cpp ./BackEnd.cpp -o main");
 
-    system("g++ -g -fsanitize=address ./main.cpp ./FrontEnd/LexicalAnalyzator.cpp -o main");
+    system("g++ -g -fsanitize=address ./main.cpp ./Stack/Stack.cpp ./Stack/Log.cpp ./Tree/Tree.cpp ./Tree/TreeDump.cpp ./FrontEnd/LexicalAnalyzator.cpp ./FrontEnd/SyntaxAnalyzator.cpp -o main");
 
     char cmd[100] = "./main";
 

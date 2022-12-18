@@ -3,30 +3,13 @@
 
 #include "../Config.h"
 #include <./stdlib.h>
-#include "../Constants.h"
+#include "../Constants/Constants.h"
 // #include "./FrontEndConstants.h"
-
-typedef double Var_val;
-
-struct Var
-{
-    char*   name ;
-    Var_val value;
-};
-
-union TokenValue
-{
-    KeyWords   key_val;
-    Operators  op_val ;
-    Separators sep_val;
-    Var        var    ;
-    double     num_val;
-};
 
 struct Token
 {
     TokenDataType val_type;
-    TokenValue    value   ;
+    Value    value   ;
 };
 
 struct ProgrammTokens
@@ -39,7 +22,7 @@ struct ProgrammTokens
 Var VarCtor(Var* var, const char* name, double value);
 int VarDtor(Var* var);
 
-Token* TokenCtor(TokenDataType val_type, TokenValue value);
+Token* TokenCtor(TokenDataType val_type, Value value);
 int    TokenDtor(Token** token);
 
 ProgrammTokens* ProgrammTokensCtor();

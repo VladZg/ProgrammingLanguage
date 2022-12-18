@@ -1,12 +1,12 @@
-#include "./Config.h"
+#include "../Config.h"
 #include <stdlib.h>
 #include <cstring>
 #include <sys/stat.h>
-#include "./Constants.h"
-#include "./DefineColourConsts.h"
-#include "./Stack/Assert.h"
-#include "./Tree.h"
-#include "./FrontEnd/LexicalAnalyzator.h"
+#include "../Constants/Constants.h"
+#include "../Constants/DefineColourConsts.h"
+#include "../Assert.h"
+#include "../Tree/Tree.h"
+#include "../FrontEnd/LexicalAnalyzator.h"
 #include "./BackEnd.h"
 
 int ProcessProgramm(Node* node)

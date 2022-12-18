@@ -1,18 +1,16 @@
 #ifndef TREE_H
 #define TREE_H
 
-#include "./Config.h"
+#include "../Config.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "./Constants.h"
+#include "../Constants/Constants.h"
 
 struct Node
 {
-    enum TreeDataType val_type;
+    NodeDataType val_type = NODE_NULL_TYPE;
 
-    enum   Operators  op_val;
-    double            num_val;
-    const  char*      var_val;
+    Value value;
 
     Node*  prev;
     Node*  left;
@@ -36,28 +34,30 @@ struct ExpressionVar
 void WarningMessage(const char* function_name, const char* fmt_msg, ...);
 
 int NodeVerify (const char* function_name, const Node* node);
-int NodeCtor   (Node* node, enum TreeDataType val_type, double num_val, const char* var_val, enum Operators op_val);
+int NodeCtor   (Node* node, NodeDataType val_type, Value value);
 int NodeDtor   (Node** node);
 int NodeConnect(Node* left, Node* right, Node* root);
 
-Node* CreateNode(enum TreeDataType val_type, double num_val, const char* var_val, enum Operators op_val, Node* left, Node* right);
+Node* CreateNode(NodeDataType val_type, Value value, Node* left, Node* right);
 Node* CopyNode(const Node* node);
 Node* CalculateConstantSubtrees(Node* node);
 Node* DestroyNeutralTreeElements(Node* node);
 Node* SimplifyTree(Node** node);
 int IsVarsInTree(const Node* node);
 
-int TreeVerify(const Tree* tree);
-int TreeCtor  (Tree* tree);
-int TreeDtor  (Tree* tree);
 size_t TreeDepth(const Node* node);
 size_t TreeNumberOfNodes(const Node* node);
 
-enum Operators IsOperator(const char* node_val);
-int IsVar(const char* node_val);
+Operators IsOperator(const char* node_val);
+Separators IsSeparator(const char* node_val);
+KeyWords IsKeyWord(const char* node_val);
 
-void NodeValPrint      (const Node* node, FILE* stream);
-void OperatorPrint     (enum Operators op_code, FILE* stream);
+void OperatorPrint(Operators code, FILE* stream);
+void SeparatorPrint(Separators code, FILE* stream);
+void KeyWordPrint(KeyWords code, FILE* stream);
+void VarPrint(Var var, FILE* stream);
+void NodeValPrint(const Node* node, FILE* stream);
+
 void TreePreorderPrint (const Node* node, FILE* stream);
 void TreeInorderPrint  (const Node* node, FILE* stream);
 void TreePostorderPrint(const Node* node, FILE* stream);
@@ -80,6 +80,6 @@ void TreePostorderPrint(const Node* node, FILE* stream);
 
 #endif
 
-#include "./DiffDSL.h"
+#include "./TreeDSL.h"
 
 #endif

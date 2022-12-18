@@ -5,22 +5,22 @@
 #include <sys/stat.h>
 #include <cstdio>
 #include <cstring>
-#include "./Constants.h"
-#include "./DefineColourConsts.h"
-#include "./Stack/Assert.h"
+#include "./Constants/Constants.h"
+#include "./Constants/DefineColourConsts.h"
+#include "./Assert.h"
 #include "./Stack/Stack.h"
-#include "./Tree.h"
-#include "./TreeDump.h"
+#include "./Tree/Tree.h"
+#include "./Tree/TreeDump.h"
 // #include "./ReadAndWriteFunctions.h"
-#include "./DiffDSL.h"
+#include "./Tree/TreeDSL.h"
 
 #include "./FrontEnd/LexicalAnalyzator.h"
 #include "./FrontEnd/SyntaxAnalyzator.h"
-#include "./BackEnd.h"
+#include "./BackEnd/BackEnd.h"
 
 int main()
 {
-    FILE* file = fopen("./programm.vlds", "r");
+    FILE* file = fopen("./Programms/programm.vlds", "r");
 
     char programm_code[MAX_PROGRAMM_LENGTH] = {};
 
@@ -39,12 +39,27 @@ int main()
 
     // fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
 
-    // Node* root = GetG(&programm_tokens, programm_code_analyzed);
+    Node* root = GetProgramm(programm_tokens);
 
-    // ShowTree(root, SIMPLE_DUMP_MODE, 1);
+//     Value value1 = {};
+//     value1.num_val = 99.87;
+//
+//     Value value2 = {};
+//     value2.sep_val = SEP_SEMI_COLON;
+//
+//     Value value3 = {};
+//     value3.op_val = OP_ADD;
+//
+//     Node* node_l = CreateNode(NODE_NUM_TYPE, value1, nullptr, nullptr);
+//     Node* node_r = CreateNode(NODE_SEP_TYPE, value2, nullptr, nullptr);
+//     Node* root = CreateNode(NODE_OP_TYPE, value3, node_l, node_r);
+
+    ShowTree(root, SIMPLE_DUMP_MODE, 0);
+    ShowTree(root, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);
     // TreeInorderPrint(root, stdout);
+    // fprintf(stdout, "\n");
 
     // ShowTree(root, FULL_FULL_DUMP_MODE, 1);
 
@@ -58,7 +73,7 @@ int main()
     // fprintf(stderr, "%f %f %d\n", (float) 5, (float) 2, (int) pow(5, 2));
 
     ProgrammTokensDtor(&programm_tokens);
-    // NodeDtor(&root);
+    NodeDtor(&root);
 
     return 1;
 }

@@ -1,0 +1,26 @@
+digraph G{
+    rankdir = TB;
+    edge[ colour = black ];
+    node[ colour = black, shape = rectangle, fontsize = 10 ];
+    node10 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n OPERATOR | <data> + } | { <this> this:\n0x6060000003e0 | <prev> prev:\n(nil) } | { <left> left:\n0x6060000000e0 | <right> right:\n0x606000000380 }}"];
+    node2 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n OPERATOR | <data> / } | { <this> this:\n0x6060000000e0 | <prev> prev:\n0x6060000003e0 } | { <left> left:\n0x606000000020 | <right> right:\n0x606000000080 }}"];
+    node0 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 17 } | { <this> this:\n0x606000000020 | <prev> prev:\n0x6060000000e0 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node1 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 2 } | { <this> this:\n0x606000000080 | <prev> prev:\n0x6060000000e0 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node9 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n OPERATOR | <data> * } | { <this> this:\n0x606000000380 | <prev> prev:\n0x6060000003e0 } | { <left> left:\n0x606000000140 | <right> right:\n0x606000000320 }}"];
+    node3 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 3 } | { <this> this:\n0x606000000140 | <prev> prev:\n0x606000000380 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node8 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n OPERATOR | <data> - } | { <this> this:\n0x606000000320 | <prev> prev:\n0x606000000380 } | { <left> left:\n0x6060000001a0 | <right> right:\n0x6060000002c0 }}"];
+    node4 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 1 } | { <this> this:\n0x6060000001a0 | <prev> prev:\n0x606000000320 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node7 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n OPERATOR | <data> + } | { <this> this:\n0x6060000002c0 | <prev> prev:\n0x606000000320 } | { <left> left:\n0x606000000200 | <right> right:\n0x606000000260 }}"];
+    node5 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 2 } | { <this> this:\n0x606000000200 | <prev> prev:\n0x6060000002c0 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node6 [shape = record, style = filled, fillcolor = lightblue, label = "{{ <data_type> data_type:\n NUMBER | <data> 4 } | { <this> this:\n0x606000000260 | <prev> prev:\n0x6060000002c0 } | { <left> left:\n(nil) | <right> right:\n(nil) }}"];
+    node10 -> node2;
+    node2 -> node0;
+    node2 -> node1;
+    node9 -> node3;
+    node8 -> node4;
+    node7 -> node5;
+    node7 -> node6;
+    node8 -> node7;
+    node9 -> node8;
+    node10 -> node9;
+}

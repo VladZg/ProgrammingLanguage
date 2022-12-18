@@ -1,9 +1,9 @@
-#include "./Config.h"
+#include "../Config.h"
 #include <stdlib.h>
 #include <time.h>
-#include "./Constants.h"
-#include "./DefineColourConsts.h"
-#include "./Stack/Assert.h"
+#include "../Constants/Constants.h"
+#include "../Constants/DefineColourConsts.h"
+#include "../Assert.h"
 #include "./Tree.h"
 
 extern size_t N_dump_picture;
@@ -12,16 +12,25 @@ size_t N_dump_picture = 0;
 
 static const char* NodeDataType(const Node* node)
 {
-    if (node->val_type == NUM_TYPE)
-        return "NUM";
+    if (node->val_type == NODE_NUM_TYPE)
+        return "NUMBER";
 
-    if (node->val_type == VAR_TYPE)
-        return "VAR";
+    if (node->val_type == NODE_VAR_TYPE)
+        return "VARIABLE";
 
-    if (node->val_type == OP_TYPE)
-        return "OP";
+    if (node->val_type == NODE_OP_TYPE)
+        return "OPERATOR";
 
-    return "NULL";
+    if (node->val_type == NODE_SEP_TYPE)
+        return "SEPARATOR";
+
+    if (node->val_type == NODE_KEY_TYPE)
+        return "KEY WORD";
+
+    if (node->val_type == NODE_FUNC_TYPE)
+        return "FUNCTION";
+
+    return "EMPTY";
 }
 
 int TreeCreateFullDotNodes(const Node* node, FILE* dot_file, enum TreeDumpModes dump_mode)
@@ -111,14 +120,14 @@ int TreeFullDotDump(const Node* node, FILE* dot_file, enum TreeDumpModes dump_mo
     return 1;
 }
 
-int ShowTree(const Node* node, enum TreeDumpModes dump_mode, int open_html_dump)
+int ShowTree(const Node* node, TreeDumpModes dump_mode, int open_html_dump)
 {
     ASSERT(node != nullptr);
     // VERIFY_NODE(node);
 
     VERIFY_NODE(node);
 
-    FILE* dot_file = fopen("./TreeDump/TextForTreeDump.dot", "w");
+    FILE* dot_file = fopen("./Tree/TreeDump/TextForTreeDump.dot", "w");
     ASSERT(dot_file != nullptr);
 
     TreeFullDotDump(node, dot_file, dump_mode);
@@ -130,11 +139,11 @@ int ShowTree(const Node* node, enum TreeDumpModes dump_mode, int open_html_dump)
 
     N_dump_picture != 0 ? html_file_opening_mode[0] = 'a' : html_file_opening_mode[0] = 'w';
 
-    sprintf(cmd, "dot " "./TreeDump/TextForTreeDump.dot" " -Tsvg -o" "./TreeDump/DumpPictures/TreeDump%ld.svg", ++N_dump_picture);
+    sprintf(cmd, "dot " "./Tree/TreeDump/TextForTreeDump.dot" " -Tsvg -o" "./Tree/TreeDump/DumpPictures/TreeDump%ld.svg", ++N_dump_picture);
 
     system(cmd);
 
-    FILE* file_html = fopen("./TreeDump/HtmlTreeDump.html", html_file_opening_mode);
+    FILE* file_html = fopen("./Tree/TreeDump/HtmlTreeDump.html", html_file_opening_mode);
     ASSERT(file_html != nullptr);
 
     // fseek(file_html, 0, SEEK_SET);
@@ -159,7 +168,7 @@ int ShowTree(const Node* node, enum TreeDumpModes dump_mode, int open_html_dump)
     fclose(file_html);
 
     #ifndef NOPEN_DUMPS
-    if (open_html_dump) system("xdg-open " "./TreeDump/HtmlTreeDump.html");
+    if (open_html_dump) system("xdg-open " "./Tree/TreeDump/HtmlTreeDump.html");
     #endif
 
     return 1;
