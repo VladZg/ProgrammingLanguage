@@ -1,3 +1,5 @@
+//DEF_OP(op_code, op_name, op_lang_name)
+
 DEF_OP(1,  ADD ,  "+"    )
 DEF_OP(2,  SUB ,  "-"    )
 DEF_OP(3,  DIV ,  "/"    )

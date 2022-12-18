@@ -1,3 +1,5 @@
+//DEF_SEP(sep_code, sep_name, sep_lang_name)
+
 DEF_SEP(1, L_ROUND_BRACKET , "(")
 DEF_SEP(2, R_ROUND_BRACKET , ")")
 DEF_SEP(3, L_FIGURE_BRACKET, "{")

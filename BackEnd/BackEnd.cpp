@@ -13,7 +13,7 @@ int ProcessProgramm(Node* node)
 {
     ASSERT(node != nullptr);
 
-    FILE* asm_file = fopen("./Processor/Source.txt", "w");
+    FILE* asm_file = fopen("./Programms/Source.txt", "w");
 
     TranslateProgrammToAsm(node, asm_file);
 
@@ -22,13 +22,21 @@ int ProcessProgramm(Node* node)
 
     fclose(asm_file);
 
-    system("cd ./Processor  ;"
-           "./asm Source.txt;"
-           "./cpu           ;"
-           "cd ..           ;");
+    system("cd ./Processor                      ;"
+           "./asm ../Programms/Source.txt       ;"
+           "./cpu ../Programms/Source_output.asm;"
+           "cd ../                              ;");
 
     return 1;
 }
+
+#define DEF_OP(op_code, op_name, op_lang_name)                  \
+    case OP_##op_name:                                          \
+            {                                                   \
+                fprintf(asm_file, "%s      \\\\%sING\n\n",      \
+                                  #op_name, #op_name);          \
+                break;                                          \
+            }
 
 int TranslateProgrammToAsm(Node* node, FILE* asm_file)
 {
@@ -40,45 +48,17 @@ int TranslateProgrammToAsm(Node* node, FILE* asm_file)
     if (node->right)
         TranslateProgrammToAsm(node->right, asm_file);
 
-    if (node->val_type == NUM_TYPE)
+    if (node->val_type == NODE_NUM_TYPE)
     {
-        fprintf(asm_file, "push %d\n", (int) node->num_val);
+        fprintf(asm_file, "push %d\n", (int) node->value.num_val);
         return 1;
     }
 
-    if (node->val_type == OP_TYPE)
+    if (node->val_type == NODE_OP_TYPE)
     {
-        switch (node->op_val)
+        switch (node->value.op_val)
         {
-            case OP_ADD:
-            {
-                fprintf(asm_file, "add      \\\\adding\n\n");
-                break;
-            }
-
-            case OP_SUB:
-            {
-                fprintf(asm_file, "sub      \\\\subbing\n\n");
-                break;
-            }
-
-            case OP_MUL:
-            {
-                fprintf(asm_file, "mul      \\\\mulling\n\n");
-                break;
-            }
-
-            case OP_DIV:
-            {
-                fprintf(asm_file, "div      \\\\divving\n\n");
-                break;
-            }
-
-            case OP_DEG:
-            {
-                fprintf(asm_file, "deg      \\\\powwing\n\n");
-                break;
-            }
+            #include "../Dictionary/Operators.h"
         }
 
         return 1;
@@ -86,3 +66,5 @@ int TranslateProgrammToAsm(Node* node, FILE* asm_file)
 
     return 0;
 }
+
+#undef DEF_OP
