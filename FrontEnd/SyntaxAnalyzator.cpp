@@ -8,42 +8,7 @@
 #include "./LexicalAnalyzator.h"
 #include "./SyntaxAnalyzator.h"
 
-#define CUR_TOKEN  programm_tokens->tokens[programm_tokens->cursor]
-#define TOKEN_NEXT programm_tokens->cursor++;
-
-#define VAL_TYPE CUR_TOKEN->val_type
-#define VAL_NUM  CUR_TOKEN->value.num_val
-#define VAL_OP   CUR_TOKEN->value.op_val
-#define VAL_KEY  CUR_TOKEN->value.key_val
-#define VAL_SEP  CUR_TOKEN->value.sep_val
-#define VAL_VAR  CUR_TOKEN->value.var
-
-#define CREATE_OP( op_code, left, right )                    \
-    {                                                        \
-        Value* value = ValueCtor();                          \
-        value->op_val = op_code;                             \
-                                                             \
-        node = CreateNode(NODE_OP_TYPE, value, left, right); \
-    }
-
-#define ADD( left, right ) CREATE_OP(OP_ADD,  left, right)
-#define SUB( left, right ) CREATE_OP(OP_SUB,  left, right)
-#define MUL( left, right ) CREATE_OP(OP_MUL,  left, right)
-#define DIV( left, right ) CREATE_OP(OP_DIV,  left, right)
-#define DEG( left, right ) CREATE_OP(OP_DEG,  left, right)
-#define SQRT(left, right ) CREATE_OP(OP_SQRT, left, right)
-#define SIN( left, right ) CREATE_OP(OP_SIN,  left, right)
-#define COS( left, right ) CREATE_OP(OP_COS,  left, right)
-#define LN(  left, right ) CREATE_OP(OP_LN,   left, right)
-#define EQ(  left, right ) CREATE_OP(OP_EQ,   left, right)
-
-#define CREATE_NAME( var_name )                                     \
-    {                                                               \
-        Value* value = ValueCtor();                                 \
-        value->var   = VarCtor(var_name, NOT_NUM);                  \
-                                                                    \
-        node = CreateNode(NODE_NAME_TYPE, value, nullptr, nullptr); \
-    }
+#include "./DefineSyntaxAnalyzatorDSL.h"
 
 void SyntaxErrorPrint(size_t token_cursor, Token* token)
 {
@@ -55,8 +20,9 @@ Node* GetProgramm(ProgrammTokens* programm_tokens)
 {
     ASSERT(programm_tokens != nullptr)
 
-    Node* node = GetExpression(programm_tokens);
-    // Node* node = GetExpression(programm_tokens);
+    Node* programm_body = GetProgrammBody(programm_tokens);
+
+    Node* programm_tree = CreateNode(NODE_ST_TYPE, nullptr, programm_body, nullptr);
 
     if (!(VAL_TYPE == TOKEN_END_TYPE))
         SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
@@ -65,7 +31,18 @@ Node* GetProgramm(ProgrammTokens* programm_tokens)
 
     // ProgrammTokensDump(programm_tokens);
 
-    return node;
+    return programm_tree;
+}
+
+Node* GetProgrammBody(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* programm_body = GetAssignment(programm_tokens);
+
+    // TOKEN_NEXT
+
+    return programm_body;
 }
 
 Node* GetStatement(ProgrammTokens* programm_tokens)
@@ -105,10 +82,10 @@ Node* GetExpression(ProgrammTokens* programm_tokens)
         Node* right_node = GetMultiplication(programm_tokens);
 
         if (op_code == OP_ADD)
-            ADD(left_node, right_node)
+            ADD(node, left_node, right_node)
 
         else
-            SUB(left_node, right_node)
+            SUB(node, left_node, right_node)
     }
 
     return node;
@@ -133,10 +110,10 @@ Node* GetMultiplication(ProgrammTokens* programm_tokens)
         Node* right_node = GetDegree(programm_tokens);
 
         if (op_code == OP_MUL)
-            MUL(left_node, right_node)
+            MUL(node, left_node, right_node)
 
         else
-            DIV(left_node, right_node)
+            DIV(node, left_node, right_node)
     }
 
     return node;
@@ -161,7 +138,7 @@ Node* GetDegree(ProgrammTokens* programm_tokens)
         Node* left_node  = node;
         Node* right_node = GetPrimaryExpression(programm_tokens);
 
-        DEG(left_node, right_node)
+        DEG(node, left_node, right_node)
     }
 
     return node;
@@ -197,7 +174,7 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
     else if (VAL_TYPE == TOKEN_NUM_TYPE)
         node = GetNumber(programm_tokens);
 
-    else if (VAL_TYPE == TOKEN_VAR_TYPE)
+    else if (VAL_TYPE == TOKEN_NAME_TYPE)
         node = GetName(programm_tokens);
 
     // else
@@ -265,7 +242,7 @@ Node* GetAssignment(ProgrammTokens* programm_tokens)
 
     Node* node = nullptr;
 
-    if (VAL_TYPE == TOKEN_VAR_TYPE)
+    if (VAL_TYPE == TOKEN_NAME_TYPE)
     {
         Node* var_name_node = GetName(programm_tokens);
 
@@ -289,10 +266,7 @@ Node* GetAssignment(ProgrammTokens* programm_tokens)
         else
             SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
 
-        Value* value = ValueCtor();
-        value->op_val = OP_EQ;
-
-        node = CreateNode(NODE_OP_TYPE, value, var_name_node, var_value_node);
+        EQ(node, var_name_node, var_value_node)
     }
 
     return node;
@@ -324,9 +298,9 @@ Node* GetName(ProgrammTokens* programm_tokens)
 
     Node* node = nullptr;
 
-    if (VAL_TYPE == TOKEN_VAR_TYPE)
+    if (VAL_TYPE == TOKEN_NAME_TYPE)
     {
-        CREATE_NAME(VAL_VAR->name)
+        CREATE_NAME(node, VAL_VAR->name)
 
         TOKEN_NEXT
 
@@ -424,25 +398,4 @@ Node* GetNumber(ProgrammTokens* programm_tokens)
     return node;;
 }
 
-#undef CUR_TOKEN
-#undef TOKEN_NEXT
-
-#undef NUM_VAL
-#undef OP_VAL
-#undef KEY_VAL
-#undef SEP_VAL
-#undef VAR_VAL
-
-#undef CREATE_OP
-#undef CREATE_NAME
-
-#undef ADD
-#undef SUB
-#undef MUL
-#undef DIV
-#undef DEG
-#undef SQRT
-#undef SIN
-#undef COS
-#undef LN
-#undef EQ
+#include "./UndefSyntaxAnalyzatorDSL"

@@ -94,24 +94,23 @@ int NodeVerify(const char* function_name, const Node* node)
         }
     }
 
-    else if (node->val_type == NODE_VAR_TYPE ||
-             node->val_type == NODE_FUNC_TYPE  )
+    else if (node->val_type == NODE_NAME_TYPE)
     {
         if (!node->value->var->name)
         {
-            WarningMessage(function_name, "NODE WITH VARIABLE/FUNCTION TYPE IS EMPTY");
+            WarningMessage(function_name, "NODE WITH NAME TYPE IS EMPTY");
             return 0;
         }
 
         if (node->left)
         {
-            WarningMessage(function_name, "NODE WITH VARIABLE/FUNCTION HAS LEFT SUBNODE");
+            WarningMessage(function_name, "NODE WITH NAME HAS LEFT SUBNODE");
             return 0;
         }
 
         if (node->right)
         {
-            WarningMessage(function_name, "NODE WITH VARIABLE/FUNCTION HAS RIGHT SUBNODE");
+            WarningMessage(function_name, "NODE WITH NAME HAS RIGHT SUBNODE");
             return 0;
         }
     }
@@ -557,6 +556,11 @@ void NodeValPrint(const Node* node, FILE* stream)
     else if (node->val_type == NODE_FUNC_TYPE)
     {
         fprintf(stream, "FUNC");
+    }
+
+    else if (node->val_type == NODE_CALL_TYPE)
+    {
+        fprintf(stream, "CALL");
     }
 
     else

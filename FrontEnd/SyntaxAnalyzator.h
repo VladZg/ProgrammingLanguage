@@ -10,6 +10,7 @@
 void SyntaxErrorPrint(size_t token_cursor, Token* token);
 
 Node* GetProgramm          (ProgrammTokens* programm_tokens); // Считывание всего выражения
+Node* GetProgrammBody      (ProgrammTokens* programm_tokens);
 Node* GetStatement         (ProgrammTokens* programm_tokens);
 Node* GetBody              (ProgrammTokens* programm_tokens);
 Node* GetAssignment        (ProgrammTokens* programm_tokens);

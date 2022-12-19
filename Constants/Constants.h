@@ -78,7 +78,7 @@ enum TokenDataType
     TOKEN_KEY_TYPE     ,
     TOKEN_OP_TYPE      ,
     TOKEN_SEP_TYPE     ,
-    TOKEN_VAR_TYPE     ,
+    TOKEN_NAME_TYPE    ,
     TOKEN_NUM_TYPE     ,
 
     TOKEN_END_TYPE     ,
@@ -109,6 +109,7 @@ enum NodeDataType
     NODE_PARAM_TYPE   ,
     NODE_ST_TYPE      ,
     NODE_FUNC_TYPE    ,
+    NODE_CALL_TYPE    ,
 };
 
 enum TreeDumpModes

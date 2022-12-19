@@ -1,0 +1,32 @@
+#ifndef _UNDEF_SYNTAX_ANALYZATOR_DSL_H_
+
+#ifdef _DEFINE_SYNTAX_ANALYZATOR_DSL_H_
+#undef _DEFINE_SYNTAX_ANALYZATOR_DSL_H_
+
+#undef CUR_TOKEN
+#undef TOKEN_NEXT
+
+#undef NUM_VAL
+#undef OP_VAL
+#undef KEY_VAL
+#undef SEP_VAL
+#undef VAR_VAL
+
+#undef CREATE_EMPTY
+#undef CREATE_OP
+#undef CREATE_NAME
+
+#undef ADD
+#undef SUB
+#undef MUL
+#undef DIV
+#undef DEG
+#undef SQRT
+#undef SIN
+#undef COS
+#undef LN
+#undef EQ
+
+#endif
+
+#endif

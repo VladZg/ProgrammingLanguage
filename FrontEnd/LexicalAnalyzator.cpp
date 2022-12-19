@@ -67,7 +67,7 @@ int TokenDtor(Token** token)
     else if ((*token)->val_type == TOKEN_SEP_TYPE)
         (*token)->value.sep_val = NOT_SEP;
 
-    else if ((*token)->val_type == TOKEN_VAR_TYPE)
+    else if ((*token)->val_type == TOKEN_NAME_TYPE)
         VarDtor(&((*token)->value.var));
 
     else if ((*token)->val_type == TOKEN_NUM_TYPE)
@@ -212,7 +212,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
             fprintf(stdout, KNRM);
         }
 
-        else if (K_TOKEN->val_type == TOKEN_VAR_TYPE)
+        else if (K_TOKEN->val_type == TOKEN_NAME_TYPE)
         {
             fprintf(stdout, "VARIABLE    " KMAG "%s" KNRM " = " KRED "%lg" KNRM " %s", K_TOKEN->value.var->name, K_TOKEN->value.var->value, (K_TOKEN->value.var->value == VAR_DEAD_VAL ? KBLU "(x.x.DEAD.x.x)" KNRM : ""));
         }
@@ -494,7 +494,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
         if (var_name != nullptr)
         {
             token_value.var = VarCtor(var_name, VAR_DEAD_VAL);
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_VAR_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_NAME_TYPE, token_value);
             continue;
         }
 
