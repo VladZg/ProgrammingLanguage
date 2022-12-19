@@ -33,20 +33,20 @@ int main()
 
     AnalyzeProgrammCode(programm_tokens, programm_code);
 
-    // ProgrammTokensDump(programm_tokens);
+    ProgrammTokensDump(programm_tokens);
 
     // fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
 
     Node* programm_tree = GetProgramm(programm_tokens);
 
-    // ShowTree(root, SIMPLE_DUMP_MODE, 0);
-    // ShowTree(root, FULL_FULL_DUMP_MODE, 1);
+    ShowTree(programm_tree, SIMPLE_DUMP_MODE, 0);
+    ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);
     // TreeInorderPrint(root, stdout);
     // fprintf(stdout, "\n");
 
-    ProcessProgramm(programm_tree);
+    // ProcessProgramm(programm_tree);
 
     ProgrammTokensDtor(&programm_tokens);
     NodeDtor(&programm_tree);

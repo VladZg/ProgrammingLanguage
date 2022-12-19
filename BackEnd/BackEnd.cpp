@@ -30,7 +30,7 @@ int ProcessProgramm(Node* node)
     return 1;
 }
 
-#define DEF_OP(op_code, op_name, op_lang_name)                  \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)    \
     case OP_##op_name:                                          \
             {                                                   \
                 fprintf(asm_file, "%s      \\\\%sING\n\n",      \
@@ -50,13 +50,13 @@ int TranslateProgrammToAsm(Node* node, FILE* asm_file)
 
     if (node->val_type == NODE_NUM_TYPE)
     {
-        fprintf(asm_file, "push %d\n", (int) node->value.num_val);
+        fprintf(asm_file, "push %d\n", (int) node->value->num_val);
         return 1;
     }
 
     if (node->val_type == NODE_OP_TYPE)
     {
-        switch (node->value.op_val)
+        switch (node->value->op_val)
         {
             #include "../Dictionary/Operators.h"
         }

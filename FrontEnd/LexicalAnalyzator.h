@@ -9,7 +9,7 @@
 struct Token
 {
     TokenDataType val_type;
-    Value    value   ;
+    Value value;
 };
 
 struct ProgrammTokens
@@ -19,8 +19,8 @@ struct ProgrammTokens
     size_t  cursor;
 };
 
-Var VarCtor(Var* var, const char* name, double value);
-int VarDtor(Var* var);
+Var* VarCtor(const char* name, double value);
+int  VarDtor(Var** var);
 
 Token* TokenCtor(TokenDataType val_type, Value value);
 int    TokenDtor(Token** token);

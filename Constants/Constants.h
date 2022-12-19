@@ -10,7 +10,7 @@ enum Constants
     MAX_PROGRAMM_LENGTH = 500,
 };
 
-#define DEF_KEY(key_code, key_name, key_lang_name) \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name) \
     KEY_##key_name = key_code,
 
 enum KeyWords
@@ -21,7 +21,7 @@ enum KeyWords
 
 #undef DEF_KEY
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name) \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name) \
     SEP_##sep_name = sep_code,
 
 enum Separators
@@ -32,7 +32,7 @@ enum Separators
 
 #undef DEF_SEP
 
-#define DEF_OP(op_code, op_name, op_lang_name) \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name) \
     OP_##op_name = op_code,
 
 enum Operators
@@ -58,6 +58,7 @@ struct Var
 
 enum VarConstants
 {
+    MAX_VAR_NAME_LEN = 20,
     VAR_DEAD_VAL = 193726,
 };
 
@@ -66,7 +67,7 @@ union Value
     KeyWords   key_val;
     Operators  op_val ;
     Separators sep_val;
-    Var        var    ;
+    Var*       var    ;
     double     num_val;
 };
 
@@ -100,10 +101,13 @@ enum NodeDataType
     NODE_NULL_TYPE = 0,
 
     NODE_NUM_TYPE     ,
+    NODE_NAME_TYPE    ,
     NODE_VAR_TYPE     ,
     NODE_OP_TYPE      ,
     NODE_KEY_TYPE     ,
     NODE_SEP_TYPE     ,
+    NODE_PARAM_TYPE   ,
+    NODE_ST_TYPE      ,
     NODE_FUNC_TYPE    ,
 };
 

@@ -30,6 +30,15 @@ static const char* NodeDataType(const Node* node)
     if (node->val_type == NODE_FUNC_TYPE)
         return "FUNCTION";
 
+    if (node->val_type == NODE_NAME_TYPE)
+        return "NAME";
+
+    if (node->val_type == NODE_ST_TYPE)
+        return "STATEMENT";
+
+    if (node->val_type == NODE_PARAM_TYPE)
+        return "PARAMETER";
+
     return "EMPTY";
 }
 

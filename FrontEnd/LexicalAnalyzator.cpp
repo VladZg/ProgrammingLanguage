@@ -5,26 +5,38 @@
 #include "../Assert.h"
 #include "./LexicalAnalyzator.h"
 
-Var VarCtor(Var* var, const char* name, double value)
+Var* VarCtor(const char* name, double value)
 {
+    ASSERT(name != nullptr)
+
+    Var* var = (Var*) calloc(1, sizeof(Var));
     ASSERT(var != nullptr)
 
     var->name = strdup(name);
-    ASSERT(name != nullptr)
+    ASSERT(var->name != nullptr)
 
     var->value = value;
 
-    return *var;
+    return var;
 }
 
-int VarDtor(Var* var)
+int VarDtor(Var** var)
 {
-    if (!var) return 1;
+    ASSERT(var != nullptr)
 
-    free((void*) var->name);
+    if (!(*var))
+        return 1;
 
-    var->name  = nullptr;
-    var->value = VAR_DEAD_VAL;
+    if ((*var)->name)
+    {
+        free((void*) (*var)->name);
+        (*var)->name  = nullptr;
+    }
+
+    (*var)->value = VAR_DEAD_VAL;
+
+    free((void*) *var);
+    *var = nullptr;
 
     return 1;
 }
@@ -113,7 +125,7 @@ int ProgrammTokensDtor(ProgrammTokens** programm_tokens)
 
 #undef CUR_TOKEN
 
-#define DEF_OP(op_code, op_name, op_lang_name)               \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name) \
     if (code == OP_##op_name) fprintf(stdout, op_lang_name); \
     else
 
@@ -130,8 +142,8 @@ void OperatorDump(Operators code)
 
 #undef DEF_OP
 
-#define DEF_KEY(key_code, key_name, key_lang_name)              \
-    if (code == KEY_##key_name) fprintf(stdout, key_lang_name); \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name) \
+    if (code == KEY_##key_name) fprintf(stdout, key_lang_name);   \
     else
 
 void KeyWordDump(KeyWords code)
@@ -147,8 +159,8 @@ void KeyWordDump(KeyWords code)
 
 #undef DEF_KEY
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name)              \
-    if (code == SEP_##sep_name) fprintf(stdout, sep_lang_name); \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name) \
+    if (code == SEP_##sep_name) fprintf(stdout, #sep_name);       \
     else
 
 void SeparatorDump(Separators code)
@@ -188,7 +200,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
 
         else if (K_TOKEN->val_type == TOKEN_OP_TYPE)
         {
-            fprintf(stdout, "OPERATOR  %d  " KCYN, K_TOKEN->value.op_val);
+            fprintf(stdout, "OPERATOR  %d " KCYN, K_TOKEN->value.op_val);
             OperatorDump(K_TOKEN->value.op_val);
             fprintf(stdout, KNRM);
         }
@@ -202,7 +214,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
 
         else if (K_TOKEN->val_type == TOKEN_VAR_TYPE)
         {
-            fprintf(stdout, "VARIABLE    " KMAG "%s" KNRM " = " KRED "%lg" KNRM " %s", K_TOKEN->value.var.name, K_TOKEN->value.var.value, (K_TOKEN->value.var.value == VAR_DEAD_VAL ? KBLU "(x.x.DEAD.x.x)" KNRM : ""));
+            fprintf(stdout, "VARIABLE    " KMAG "%s" KNRM " = " KRED "%lg" KNRM " %s", K_TOKEN->value.var->name, K_TOKEN->value.var->value, (K_TOKEN->value.var->value == VAR_DEAD_VAL ? KBLU "(x.x.DEAD.x.x)" KNRM : ""));
         }
 
         else if (K_TOKEN->val_type == TOKEN_NUM_TYPE)
@@ -289,7 +301,7 @@ char* CheckForVar(char* programm_code, size_t* i_letter)
     return var_name;
 }
 
-#define DEF_OP(op_code, op_name, op_lang_name)                            \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)              \
                                                                           \
     if (OP_##op_name != NOT_OP && !strcasecmp(lexema_name, op_lang_name)) \
         op_val = OP_##op_name;                                            \
@@ -333,11 +345,11 @@ Operators CheckForOperator(char* programm_code, size_t* i_letter)
 
 #undef DEF_OP
 
-#define DEF_KEY(key_code, key_name, key_lang_name)                           \
-                                                                             \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)                           \
+                                                                              \
     if (KEY_##key_name != NOT_KEY && !strcasecmp(lexema_name, key_lang_name)) \
-        key_val = KEY_##key_name;                                            \
-                                                                             \
+        key_val = KEY_##key_name;                                             \
+                                                                              \
     else
 
 KeyWords CheckForKeyWord(char* programm_code, size_t* i_letter)
@@ -369,7 +381,7 @@ KeyWords CheckForKeyWord(char* programm_code, size_t* i_letter)
 
 #undef DEF_KEY
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name)                            \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name)             \
                                                                               \
     if (SEP_##sep_name != NOT_SEP && !strcasecmp(lexema_name, sep_lang_name)) \
         sep_val = SEP_##sep_name;                                             \
@@ -481,7 +493,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
         if (var_name != nullptr)
         {
-            token_value.var = VarCtor(&token_value.var, var_name, VAR_DEAD_VAL);
+            token_value.var = VarCtor(var_name, VAR_DEAD_VAL);
             CUR_TOKEN_NEXT = TokenCtor(TOKEN_VAR_TYPE, token_value);
             continue;
         }

@@ -8,7 +8,9 @@
 #include "./LexicalAnalyzator.h"
 #include "./SyntaxAnalyzator.h"
 
-#define CUR_TOKEN programm_tokens->tokens[programm_tokens->cursor]
+#define CUR_TOKEN  programm_tokens->tokens[programm_tokens->cursor]
+#define TOKEN_NEXT programm_tokens->cursor++;
+
 #define VAL_TYPE CUR_TOKEN->val_type
 #define VAL_NUM  CUR_TOKEN->value.num_val
 #define VAL_OP   CUR_TOKEN->value.op_val
@@ -18,8 +20,8 @@
 
 #define CREATE_OP( op_code, left, right )                    \
     {                                                        \
-        Value value = {};                                    \
-        value.op_val = op_code;                              \
+        Value* value = ValueCtor();                          \
+        value->op_val = op_code;                             \
                                                              \
         node = CreateNode(NODE_OP_TYPE, value, left, right); \
     }
@@ -35,6 +37,14 @@
 #define LN(  left, right ) CREATE_OP(OP_LN,   left, right)
 #define EQ(  left, right ) CREATE_OP(OP_EQ,   left, right)
 
+#define CREATE_NAME( var_name )                                     \
+    {                                                               \
+        Value* value = ValueCtor();                                 \
+        value->var   = VarCtor(var_name, NOT_NUM);                  \
+                                                                    \
+        node = CreateNode(NODE_NAME_TYPE, value, nullptr, nullptr); \
+    }
+
 void SyntaxErrorPrint(size_t token_cursor, Token* token)
 {
     fprintf(stderr, KYEL "Syntax error on the %ld token: !\n" KNRM, token_cursor);
@@ -43,7 +53,10 @@ void SyntaxErrorPrint(size_t token_cursor, Token* token)
 
 Node* GetProgramm(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = GetExpression(programm_tokens);
+    // Node* node = GetExpression(programm_tokens);
 
     if (!(VAL_TYPE == TOKEN_END_TYPE))
         SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
@@ -55,8 +68,28 @@ Node* GetProgramm(ProgrammTokens* programm_tokens)
     return node;
 }
 
+Node* GetStatement(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = nullptr;
+
+    return node;
+}
+
+Node* GetBody(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = GetAssignment(programm_tokens);
+
+    return node;
+}
+
 Node* GetExpression(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = GetMultiplication(programm_tokens);
 
     while (VAL_TYPE == TOKEN_OP_TYPE &&
@@ -64,7 +97,7 @@ Node* GetExpression(ProgrammTokens* programm_tokens)
     {
         Operators op_code = VAL_OP;
 
-        programm_tokens->cursor++;
+        TOKEN_NEXT
 
         // ProgrammTokensDump(programm_tokens);
 
@@ -83,6 +116,8 @@ Node* GetExpression(ProgrammTokens* programm_tokens)
 
 Node* GetMultiplication(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = GetDegree(programm_tokens);
 
     while (VAL_TYPE == TOKEN_OP_TYPE &&
@@ -90,7 +125,7 @@ Node* GetMultiplication(ProgrammTokens* programm_tokens)
     {
         Operators op_code = VAL_OP;
 
-        programm_tokens->cursor++;
+        TOKEN_NEXT
 
         // ProgrammTokensDump(programm_tokens);
 
@@ -109,6 +144,8 @@ Node* GetMultiplication(ProgrammTokens* programm_tokens)
 
 Node* GetDegree(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = GetPrimaryExpression(programm_tokens);
 
     // fprintf(stderr, );
@@ -117,7 +154,7 @@ Node* GetDegree(ProgrammTokens* programm_tokens)
     while (VAL_TYPE == TOKEN_OP_TYPE &&
            VAL_OP == OP_DEG            )
     {
-        programm_tokens->cursor++;
+        TOKEN_NEXT
 
         // ProgrammTokensDump(programm_tokens);
 
@@ -132,6 +169,8 @@ Node* GetDegree(ProgrammTokens* programm_tokens)
 
 Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = nullptr;
 
     if (VAL_TYPE == TOKEN_SEP_TYPE &&
@@ -139,7 +178,7 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
     {
         // HERE(1)
 
-        programm_tokens->cursor++;
+        TOKEN_NEXT
 
         node = GetExpression(programm_tokens);
 
@@ -152,14 +191,17 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 
         // ProgrammTokensDump(programm_tokens);
 
-        programm_tokens->cursor++;
+        TOKEN_NEXT
     }
 
     else if (VAL_TYPE == TOKEN_NUM_TYPE)
         node = GetNumber(programm_tokens);
 
+    else if (VAL_TYPE == TOKEN_VAR_TYPE)
+        node = GetName(programm_tokens);
+
     // else
-    //     node = GetW(programm_tokens);
+        // node = GetW(programm_tokens);
 
     // ShowTree(node, SIMPLE_DUMP_MODE, 1);
 
@@ -216,48 +258,158 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 //
 //     return node;
 // }
-//
-// char* GetVariable(const char** expression_str)
-// {
-//     char* name = (char*) calloc(MAX_VAR_NAME_LEN, sizeof(char));
-//
-//     int i = 0;
-//
-//     while (('A' <= **expression_str && **expression_str <= 'Z') ||
-//            ('a' <= **expression_str && **expression_str <= 'z')   )
-//     {
-//         name[i++] = **expression_str;
-//
-//         (*expression_str)++;
-//     }
-//
-//     return name;
-// }
 
-Node* GetWhile(ProgrammTokens* programm_tokens)
+Node* GetAssignment(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = nullptr;
+
+    if (VAL_TYPE == TOKEN_VAR_TYPE)
+    {
+        Node* var_name_node = GetName(programm_tokens);
+
+        if (VAL_TYPE == TOKEN_OP_TYPE &&
+            VAL_OP   == OP_EQ           )
+        {
+            TOKEN_NEXT
+        }
+
+        else
+            SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
+
+        Node* var_value_node = GetExpression(programm_tokens);
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE &&
+            VAL_SEP  == SEP_SEMI_COLON   )
+        {
+            TOKEN_NEXT
+        }
+
+        else
+            SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
+
+        Value* value = ValueCtor();
+        value->op_val = OP_EQ;
+
+        node = CreateNode(NODE_OP_TYPE, value, var_name_node, var_value_node);
+    }
+
+    return node;
+}
+
+Node* GetFunctionDefinition(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = nullptr;
 
     return node;
 }
 
-Node* GetCondition(ProgrammTokens* programm_tokens)
+// Node* GetFunctionCall(ProgrammTokens* programm_tokens)
+// {
+//     ASSERT(programm_tokens != nullptr)
+//
+//     Node* node = nullptr;
+//
+//
+//
+//     return node;
+// }
+
+Node* GetName(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = nullptr;
+
+    if (VAL_TYPE == TOKEN_VAR_TYPE)
+    {
+        CREATE_NAME(VAL_VAR->name)
+
+        TOKEN_NEXT
+
+        // ProgrammTokensDump(programm_tokens);
+    }
+
+    return node;
+}
+
+Node* GetWhile(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = nullptr;
+
+    if (VAL_TYPE == TOKEN_KEY_TYPE &&
+        VAL_KEY  == KEY_WHILE        )
+    {
+        Value* value = ValueCtor();
+        value->key_val = KEY_WHILE;
+
+        Node* condition_node  = GetExpression(programm_tokens);
+        // ASSERT(condition_node != nullptr)
+
+        Node* while_body_node = GetBlock(programm_tokens);
+        // ASSERT(while_body_node != nullptr)
+
+        node = CreateNode(NODE_KEY_TYPE, value, condition_node, while_body_node);
+    }
+
+    return node;
+}
+
+Node* GetIfElseCondition(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = nullptr;
+
+    return node;
+}
+
+Node* GetBlock(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* node = nullptr;
+
+    if (VAL_TYPE == TOKEN_SEP_TYPE        &&
+       (VAL_SEP  == SEP_L_ROUND_BRACKET ) ||
+       (VAL_SEP  == SEP_L_FIGURE_BRACKET) ||
+       (VAL_SEP  == SEP_L_SQUARE_BRACKET)   )
+    {
+        // node = Get
+
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE       &&
+           (VAL_SEP  == SEP_R_ROUND_BRACKET  ||
+            VAL_SEP  == SEP_R_FIGURE_BRACKET ||
+            VAL_SEP  == SEP_R_SQUARE_BRACKET   ))
+        {
+            TOKEN_NEXT
+        }
+
+        else
+            SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
+    }
 
     return node;
 }
 
 Node* GetNumber(ProgrammTokens* programm_tokens)
 {
+    ASSERT(programm_tokens != nullptr)
+
     Node* node = nullptr;
 
     // ProgrammTokensDump(programm_tokens);
 
     if (VAL_TYPE == TOKEN_NUM_TYPE)
     {
-        Value value = {};
-        value.num_val = VAL_NUM;
+        Value* value = ValueCtor();
+        value->num_val = VAL_NUM;
 
         node = CreateNode(NODE_NUM_TYPE, value, nullptr, nullptr);
     }
@@ -267,12 +419,14 @@ Node* GetNumber(ProgrammTokens* programm_tokens)
 
     else SyntaxErrorPrint(programm_tokens->cursor, CUR_TOKEN);
 
-    programm_tokens->cursor++;
+    TOKEN_NEXT
 
     return node;;
 }
 
 #undef CUR_TOKEN
+#undef TOKEN_NEXT
+
 #undef NUM_VAL
 #undef OP_VAL
 #undef KEY_VAL
@@ -280,6 +434,7 @@ Node* GetNumber(ProgrammTokens* programm_tokens)
 #undef VAR_VAL
 
 #undef CREATE_OP
+#undef CREATE_NAME
 
 #undef ADD
 #undef SUB

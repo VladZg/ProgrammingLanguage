@@ -10,7 +10,7 @@ struct Node
 {
     NodeDataType val_type = NODE_NULL_TYPE;
 
-    Value value;
+    Value* value;
 
     Node*  prev;
     Node*  left;
@@ -33,12 +33,15 @@ struct ExpressionVar
 
 void WarningMessage(const char* function_name, const char* fmt_msg, ...);
 
+Value* ValueCtor();
+int ValueDtor(Value** value, NodeDataType val_type);
+
 int NodeVerify (const char* function_name, const Node* node);
-int NodeCtor   (Node* node, NodeDataType val_type, Value value);
+int NodeCtor   (Node* node, NodeDataType val_type, Value* value);
 int NodeDtor   (Node** node);
 int NodeConnect(Node* left, Node* right, Node* root);
 
-Node* CreateNode(NodeDataType val_type, Value value, Node* left, Node* right);
+Node* CreateNode(NodeDataType val_type, Value* value, Node* left, Node* right);
 Node* CopyNode(const Node* node);
 Node* CalculateConstantSubtrees(Node* node);
 Node* DestroyNeutralTreeElements(Node* node);
@@ -55,7 +58,7 @@ KeyWords IsKeyWord(const char* node_val);
 void OperatorPrint(Operators code, FILE* stream);
 void SeparatorPrint(Separators code, FILE* stream);
 void KeyWordPrint(KeyWords code, FILE* stream);
-void VarPrint(Var var, FILE* stream);
+void VarPrint(Var* var, FILE* stream);
 void NodeValPrint(const Node* node, FILE* stream);
 
 void TreePreorderPrint (const Node* node, FILE* stream);

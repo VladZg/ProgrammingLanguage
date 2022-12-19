@@ -22,6 +22,45 @@ void WarningMessage(const char* function_name, const char* fmt_msg, ...)
     va_end(args);
 }
 
+Value* ValueCtor()
+{
+    Value* value = (Value*) calloc(1, sizeof(Value));
+    ASSERT(value != nullptr)
+
+    return value;
+}
+
+
+int ValueDtor(Value** value, NodeDataType val_type)
+{
+    ASSERT(value != nullptr)
+
+    if (!(*value))
+        return 1;
+
+    if (val_type == NODE_NUM_TYPE)
+        (*value)->num_val = NOT_NUM;
+
+    else if (val_type == NODE_OP_TYPE)
+        (*value)->num_val = NOT_OP;
+
+    else if (val_type == NODE_SEP_TYPE)
+        (*value)->num_val = NOT_SEP;
+
+    else if (val_type == NODE_KEY_TYPE)
+        (*value)->num_val = NOT_KEY;
+
+    else if (val_type == NODE_NAME_TYPE && (*value)->var)
+    {
+        VarDtor(&(*value)->var);
+    }
+
+    free((void*) *value);
+    *value = nullptr;
+
+    return 1;
+}
+
 // #define WARNING(fmt_msg, ...) \
 {\
     if (sizeof((int[]){__VA_ARGS__})/sizeof(int) > 0)               \
@@ -58,7 +97,7 @@ int NodeVerify(const char* function_name, const Node* node)
     else if (node->val_type == NODE_VAR_TYPE ||
              node->val_type == NODE_FUNC_TYPE  )
     {
-        if (!node->value.var.name)
+        if (!node->value->var->name)
         {
             WarningMessage(function_name, "NODE WITH VARIABLE/FUNCTION TYPE IS EMPTY");
             return 0;
@@ -79,30 +118,30 @@ int NodeVerify(const char* function_name, const Node* node)
 
     else if (node->val_type == NODE_OP_TYPE )
     {
-        if (node->value.op_val == NOT_OP)
+        if (node->value->op_val == NOT_OP)
         {
-            WarningMessage(function_name, "NODE WITH OPERATOR %d TYPE IS EMPTY", node->value.op_val);
+            WarningMessage(function_name, "NODE WITH OPERATOR %d TYPE IS EMPTY", node->value->op_val);
             return 0;
         }
 
         if (!node->left)
         {
-            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE LEFT SUBNODE", node->value.op_val);
+            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE LEFT SUBNODE", node->value->op_val);
             return 0;
         }
 
         if (!node->right)
         {
-            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value.op_val);
+            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value->op_val);
             return 0;
         }
     }
 
     else if (node->val_type == NODE_SEP_TYPE )
     {
-        if (node->value.sep_val == NOT_SEP)
+        if (node->value->sep_val == NOT_SEP)
         {
-            WarningMessage(function_name, "NODE WITH SEPARATOR %d TYPE IS EMPTY", node->value.sep_val);
+            WarningMessage(function_name, "NODE WITH SEPARATOR %d TYPE IS EMPTY", node->value->sep_val);
             return 0;
         }
 
@@ -121,9 +160,9 @@ int NodeVerify(const char* function_name, const Node* node)
 
     else if (node->val_type == NODE_KEY_TYPE )
     {
-        if (node->value.key_val == NOT_KEY)
+        if (node->value->key_val == NOT_KEY)
         {
-            WarningMessage(function_name, "NODE WITH KEY WORD %d TYPE IS EMPTY", node->value.key_val);
+            WarningMessage(function_name, "NODE WITH KEY WORD %d TYPE IS EMPTY", node->value->key_val);
             return 0;
         }
 
@@ -180,21 +219,42 @@ int NodeVerify(const char* function_name, const Node* node)
     return 1;
 }
 
-int NodeCtor(Node* node, NodeDataType val_type, Value value)
+int NodeCtor(Node* node, NodeDataType val_type, Value* value)
 {
     ASSERT(node     != nullptr);
     ASSERT(val_type != NODE_NULL_TYPE);
 
-    if (val_type == NODE_OP_TYPE && value.op_val == NOT_OP)
+    if (node->value)
     {
-        WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT NODE WITH EMPTY OPERATOR");
-        return 0;
-    }
+        if (val_type == NODE_OP_TYPE && value->op_val == NOT_OP)
+        {
+            WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT OP NODE WITH EMPTY OPERATOR");
+            return 0;
+        }
 
-    if (val_type == NODE_VAR_TYPE && !value.var.name)
-    {
-        WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT NODE WITH EMPTY VARIABLE");
-        return 0;
+        if (val_type == NODE_SEP_TYPE && value->sep_val == NOT_SEP)
+        {
+            WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT SEP NODE WITH EMPTY SEPARATOR");
+            return 0;
+        }
+
+        if (val_type == NODE_KEY_TYPE && value->key_val == NOT_KEY)
+        {
+            WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT KEY NODE WITH EMPTY KEY WORD");
+            return 0;
+        }
+
+        if (val_type == NODE_NUM_TYPE && value->num_val == NOT_NUM)
+        {
+            WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT NUM NODE WITH A DEAD NUMBER");
+            return 0;
+        }
+
+        if (val_type == NODE_NAME_TYPE && value->var->name == nullptr)
+        {
+            WarningMessage(__PRETTY_FUNCTION__, "TRIED TO CONSTRUCT NAMED NODE WITH EMPTY NAME");
+            return 0;
+        }
     }
 
     *node = {val_type, value, nullptr, nullptr, nullptr, NodeIndex++};
@@ -202,7 +262,7 @@ int NodeCtor(Node* node, NodeDataType val_type, Value value)
     return 1;
 }
 
-Node* CreateNode(NodeDataType val_type, Value value, Node* left, Node* right)
+Node* CreateNode(NodeDataType val_type, Value* value, Node* left, Node* right)
 {
     Node* node = (Node*) calloc(1, sizeof(Node));
     ASSERT(node != nullptr)
@@ -220,33 +280,31 @@ Node* CopyNode(const Node* node)
     Node* left  = CopyNode(node->left);
     Node* right = CopyNode(node->right);
 
-    Value value = {};
+    Value* value = ValueCtor();
 
     if (node->val_type == NODE_OP_TYPE)
     {
-        value.op_val = node->value.op_val;
+        value->op_val = node->value->op_val;
     }
 
-    if (node->val_type == NODE_NUM_TYPE)
+    else if (node->val_type == NODE_NUM_TYPE)
     {
-        value.num_val = node->value.num_val;
+        value->num_val = node->value->num_val;
     }
 
-    if (node->val_type == NODE_KEY_TYPE)
+    else if (node->val_type == NODE_KEY_TYPE)
     {
-        value.key_val = node->value.key_val;
+        value->key_val = node->value->key_val;
     }
 
-    if (node->val_type == NODE_SEP_TYPE)
+    else if (node->val_type == NODE_SEP_TYPE)
     {
-        value.sep_val = node->value.sep_val;
+        value->sep_val = node->value->sep_val;
     }
 
-    if (node->val_type == NODE_VAR_TYPE ||
-        node->val_type == NODE_FUNC_TYPE  )
+    else if (node->val_type == NODE_NAME_TYPE)
     {
-        Var var = {};
-        value.var = VarCtor(&var, node->value.var.name, node->value.var.value);
+        value->var = VarCtor(node->value->var->name, node->value->var->value);
     }
 
     Node* new_node = CreateNode(node->val_type, value, left, right);
@@ -270,23 +328,10 @@ int NodeDtor(Node** node)
 
     if (NODE_PTR->right) if(!NodeDtor(&(NODE_PTR->right))) return 0;
 
-    if (NODE_PTR->val_type == NODE_NUM_TYPE)
-        NODE_PTR->value.num_val = NOT_NUM;
-
-    else if (NODE_PTR->val_type == NODE_OP_TYPE)
-        NODE_PTR->value.num_val = NOT_OP;
-
-    else if (NODE_PTR->val_type == NODE_SEP_TYPE)
-        NODE_PTR->value.num_val = NOT_SEP;
-
-    else if (NODE_PTR->val_type == NODE_KEY_TYPE)
-        NODE_PTR->value.num_val = NOT_KEY;
-
-    else if (NODE_PTR->val_type == NODE_VAR_TYPE)
-        VarDtor(&NODE_PTR->value.var);
-
-    else if (NODE_PTR->val_type == NODE_FUNC_TYPE)
-        VarDtor(&NODE_PTR->value.var);
+    if (NODE_PTR->value)
+    {
+        ValueDtor(&NODE_PTR->value, NODE_PTR->val_type);
+    }
 
     NODE_PTR->val_type = NODE_NULL_TYPE;
 
@@ -375,8 +420,8 @@ size_t TreeNumberOfNodes(const Node* node)
     return 1 + TreeNumberOfNodes(node->left) + TreeNumberOfNodes(node->right);
 }
 
-#define DEF_OP(num, name, val)  \
-    if (!strcasecmp(node_val, val)) return OP_##name;  \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)      \
+    if (!strcasecmp(node_val, op_lang_name)) return OP_##op_name; \
     else
 
 Operators IsOperator(const char* node_val)
@@ -388,8 +433,8 @@ Operators IsOperator(const char* node_val)
 
 #undef DEF_OP
 
-#define DEF_SEP(num, name, val)  \
-    if (!strcasecmp(node_val, val)) return SEP_##name;  \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name)     \
+    if (!strcasecmp(node_val, sep_lang_name)) return SEP_##sep_name;  \
     else
 
 Separators IsSeparator(const char* node_val)
@@ -401,8 +446,8 @@ Separators IsSeparator(const char* node_val)
 
 #undef DEF_SEP
 
-#define DEF_KEY(num, name, val)  \
-    if (!strcasecmp(node_val, val)) return KEY_##name;  \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)    \
+    if (!strcasecmp(node_val, key_lang_name)) return KEY_##key_name; \
     else
 
 KeyWords IsKeyWord(const char* node_val)
@@ -414,8 +459,8 @@ KeyWords IsKeyWord(const char* node_val)
 
 #undef DEF_KEY
 
-#define DEF_OP(op_code, op_name, op_lang_name)                           \
-    if (code == OP_##op_name) { fprintf(stream, op_lang_name); return; }
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)             \
+    if (code == OP_##op_name) { fprintf(stream, op_tree_name); return; }
 
 void OperatorPrint(Operators code, FILE* stream)
 {
@@ -426,8 +471,8 @@ void OperatorPrint(Operators code, FILE* stream)
 
 #undef DEF_OP
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name)                          \
-    if (code == SEP_##sep_name) { fprintf(stream, sep_lang_name); return; }
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name)           \
+    if (code == SEP_##sep_name) { fprintf(stream, sep_tree_name); return; }
 
 void SeparatorPrint(Separators code, FILE* stream)
 {
@@ -438,8 +483,8 @@ void SeparatorPrint(Separators code, FILE* stream)
 
 #undef DEF_SEP
 
-#define DEF_KEY(key_code, key_name, key_lang_name)                          \
-    if (code == KEY_##key_name) { fprintf(stream, key_lang_name); return; }
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)           \
+    if (code == KEY_##key_name) { fprintf(stream, key_tree_name); return; }
 
 void KeyWordPrint(KeyWords code, FILE* stream)
 {
@@ -450,17 +495,22 @@ void KeyWordPrint(KeyWords code, FILE* stream)
 
 #undef DEF_KEY
 
-void VarPrint(Var var, FILE* stream)
+void VarPrint(Var* var, FILE* stream)
 {
-    fprintf(stream, "%s", var.name);
+    fprintf(stream, "%s", var->name);
 }
 
 void NodeValPrint(const Node* node, FILE* stream)
 {
-    if (node->val_type == NODE_NUM_TYPE)
+    if (node->val_type == NODE_NULL_TYPE)
     {
-        if (node->value.num_val == node->value.num_val) //проверка на nan
-            fprintf(stream, "%lg" , node->value.num_val);
+        fprintf(stream, "NIL");
+    }
+
+    else if (node->val_type == NODE_NUM_TYPE)
+    {
+        if (node->value->num_val == node->value->num_val) //проверка на nan
+            fprintf(stream, "%lg" , node->value->num_val);
 
         else
         {
@@ -471,26 +521,46 @@ void NodeValPrint(const Node* node, FILE* stream)
 
     else if (node->val_type == NODE_OP_TYPE)
     {
-        OperatorPrint(node->value.op_val, stream);
+        OperatorPrint(node->value->op_val, stream);
     }
 
     else if (node->val_type == NODE_SEP_TYPE)
     {
-        SeparatorPrint(node->value.sep_val, stream);
+        SeparatorPrint(node->value->sep_val, stream);
     }
 
     else if (node->val_type == NODE_KEY_TYPE)
     {
-        KeyWordPrint(node->value.key_val, stream);
+        KeyWordPrint(node->value->key_val, stream);
+    }
+
+    else if (node->val_type == NODE_NAME_TYPE)
+    {
+        VarPrint(node->value->var, stream);
     }
 
     else if (node->val_type == NODE_VAR_TYPE)
     {
-        VarPrint(node->value.var, stream);
+        fprintf(stream, "VAR");
+    }
+
+    else if (node->val_type == NODE_PARAM_TYPE)
+    {
+        fprintf(stream, "PARAM");
+    }
+
+    else if (node->val_type == NODE_ST_TYPE)
+    {
+        fprintf(stream, "ST");
+    }
+
+    else if (node->val_type == NODE_FUNC_TYPE)
+    {
+        fprintf(stream, "FUNC");
     }
 
     else
-        fprintf(stream, "EMPTY");
+        WarningMessage(__PRETTY_FUNCTION__, "TYPE OF NODE DATA IS UNKNOWN");
 }
 
 int IsVarsInTree(const Node* node)
