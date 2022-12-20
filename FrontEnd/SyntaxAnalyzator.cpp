@@ -142,8 +142,6 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
     if (VAL_TYPE == TOKEN_SEP_TYPE      &&
         VAL_SEP  == SEP_L_ROUND_BRACKET   )
     {
-        // HERE(1)
-
         TOKEN_NEXT
 
         primary_expression = GetExpression(programm_tokens);
@@ -167,16 +165,11 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 
         if (VAL_TYPE == TOKEN_SEP_TYPE)
         {
-            if (VAL_SEP == SEP_SEMI_COLON)
-            {
-                primary_expression = name;
-            }
-
-            else if (VAL_SEP == SEP_L_ROUND_BRACKET)
+            if (VAL_SEP == SEP_L_ROUND_BRACKET)
             {
                 TOKEN_NEXT
 
-                Node* function_call_params = nullptr; // GetFunctionCallParams(programm_tokens);
+                Node* function_call_params = GetFunctionCallParams(programm_tokens);
 
                 Value* value = ValueCtor();
                 value->var   = VarCtor(name->value->var->name, NOT_NUM);
@@ -187,12 +180,18 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens)
 
                 primary_expression = CreateNode(NODE_CALL_TYPE, nullptr, function_name_node, nullptr);
 
-                if (VAL_SEP == SEP_R_ROUND_BRACKET)
+                if (VAL_TYPE == TOKEN_SEP_TYPE    &&
+                    VAL_SEP == SEP_R_ROUND_BRACKET  )
                 {
                     TOKEN_NEXT
                 }
 
                 else ERROR
+            }
+
+            else
+            {
+                primary_expression = name;
             }
         }
 
@@ -227,6 +226,19 @@ Node* GetInstructions(ProgrammTokens* programm_tokens)
     return CreateNode(NODE_ST_TYPE, nullptr, instruction, next_instructions);
 }
 
+void CheckForSemiColon(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    if (VAL_TYPE == TOKEN_SEP_TYPE &&
+        VAL_SEP == SEP_SEMI_COLON    )
+    {
+        TOKEN_NEXT
+    }
+
+    else ERROR
+}
+
 Node* GetInstruction(ProgrammTokens* programm_tokens)
 {
     ASSERT(programm_tokens != nullptr)
@@ -240,14 +252,20 @@ Node* GetInstruction(ProgrammTokens* programm_tokens)
             instruction = GetInitialization(programm_tokens);
         }
 
-        if (VAL_KEY == KEY_IF)
+        else if (VAL_KEY == KEY_IF)
         {
             instruction = GetIfElseInstruction(programm_tokens);
         }
 
-        if (VAL_KEY == KEY_WHILE)
+        else if (VAL_KEY == KEY_WHILE)
         {
             instruction = GetWhileInstruction(programm_tokens);
+        }
+
+        else if (VAL_KEY == KEY_SCANF  ||
+                 VAL_KEY == KEY_PRINTF   )
+        {
+            instruction = GetIOInstruction(programm_tokens);
         }
     }
 
@@ -259,15 +277,24 @@ Node* GetInstruction(ProgrammTokens* programm_tokens)
             instruction = GetAssignment(programm_tokens);
         }
 
-        // else if (NEXT_TOKEN->val_type == TOKEN_SEP_TYPE &&
-        //          NEXT_TOKEN->value.sep_val == SEP_L_ROUND_BRACKET)
-        // {
-        //     instruction = GetFunctionCall(programm_tokens);
-        // }
+        else if (NEXT_TOKEN->val_type == TOKEN_SEP_TYPE          &&
+                 NEXT_TOKEN->value.sep_val == SEP_L_ROUND_BRACKET  )
+        {
+            instruction = GetExpression(programm_tokens);
+
+            CheckForSemiColon(programm_tokens);
+        }
     }
 
     else
-        return instruction;
+    {
+        instruction = GetExpression(programm_tokens);
+
+        if (instruction)
+        {
+            CheckForSemiColon(programm_tokens);
+        }
+    }
 
     return instruction;
 }
@@ -309,13 +336,7 @@ Node* GetInitialization(ProgrammTokens* programm_tokens)
 
             initialization = CreateNode(NODE_VAR_TYPE, nullptr, initializing_name, var_value);
 
-            if (VAL_TYPE == TOKEN_SEP_TYPE &&
-                VAL_SEP  == SEP_SEMI_COLON   )
-            {
-                TOKEN_NEXT
-            }
-
-            else ERROR
+            CheckForSemiColon(programm_tokens);
         }
 
         else if (VAL_TYPE == TOKEN_SEP_TYPE      &&
@@ -447,6 +468,74 @@ Node* GetFunctionInitParams(ProgrammTokens* programm_tokens)
     return function_init_params;
 }
 
+#define NEXT_NEXT_TOKEN programm_tokens->tokens[programm_tokens->cursor + 2]
+
+Node* GetFunctionCallParam(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* param = nullptr;
+
+    if (VAL_TYPE == TOKEN_KEY_TYPE                 &&
+        VAL_KEY  == KEY_INIT                       &&
+        NEXT_TOKEN->val_type == TOKEN_NAME_TYPE      )
+    {
+        if (NEXT_NEXT_TOKEN->val_type == TOKEN_OP_TYPE &&
+            NEXT_NEXT_TOKEN->value.op_val == OP_EQ        )
+        {
+            param = GetFunctionInitParam(programm_tokens);
+        }
+
+        else ERROR
+    }
+
+    else
+    {
+        param = GetExpression(programm_tokens);
+    }
+
+    if (VAL_TYPE != TOKEN_SEP_TYPE     ||
+        VAL_SEP != SEP_R_ROUND_BRACKET &&
+        VAL_SEP != SEP_COMMA             )
+    {
+        ERROR
+    }
+
+    return param;
+}
+
+Node* GetFunctionCallParams(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* function_call_params = nullptr;
+
+    if (VAL_TYPE != TOKEN_SEP_TYPE     &&
+        VAL_SEP  != SEP_R_ROUND_BRACKET  )
+    {
+        Node* function_call_param = GetFunctionCallParam(programm_tokens);
+        Node* function_call_next_params = nullptr;
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE &&
+            VAL_SEP  == SEP_COMMA        )
+        {
+            TOKEN_NEXT
+
+            function_call_next_params = GetFunctionCallParams(programm_tokens);
+        }
+
+        else if (VAL_TYPE != TOKEN_SEP_TYPE     ||
+                VAL_SEP != SEP_R_ROUND_BRACKET   )
+        {
+            ERROR
+        }
+
+        function_call_params = CreateNode(NODE_PARAM_TYPE, nullptr, function_call_param, function_call_next_params);
+    }
+
+    return function_call_params;
+}
+
 Node* GetAssignment(ProgrammTokens* programm_tokens)
 {
     ASSERT(programm_tokens != nullptr)
@@ -470,13 +559,7 @@ Node* GetAssignment(ProgrammTokens* programm_tokens)
         EQ(assignment, var_name_node, var_value_node)
     }
 
-    if (VAL_TYPE == TOKEN_SEP_TYPE &&
-        VAL_SEP  == SEP_SEMI_COLON   )
-    {
-        TOKEN_NEXT
-    }
-
-    else ERROR
+    CheckForSemiColon(programm_tokens);
 
     return assignment;
 }
@@ -521,24 +604,92 @@ Node* GetWhileInstruction(ProgrammTokens* programm_tokens)
 {
     ASSERT(programm_tokens != nullptr)
 
-    Node* node = nullptr;
+    Node* condition = nullptr;
+    Node* instruction_body = nullptr;
 
     if (VAL_TYPE == TOKEN_KEY_TYPE &&
-        VAL_KEY  == KEY_WHILE        )
+        VAL_KEY == KEY_WHILE         )
     {
-        Value* value = ValueCtor();
-        value->key_val = KEY_WHILE;
+        TOKEN_NEXT
 
-        Node* condition_node  = GetExpression(programm_tokens);
-        // ASSERT(condition_node != nullptr)
+        if (VAL_TYPE == TOKEN_SEP_TYPE     &&
+            VAL_SEP == SEP_L_ROUND_BRACKET   )
+        {
+            TOKEN_NEXT
 
-        Node* while_body_node = GetBlock(programm_tokens);
-        // ASSERT(while_body_node != nullptr)
+            condition = GetExpression(programm_tokens);
+            // ShowTree(condition, SIMPLE_DUMP_MODE, 1);
+        }
 
-        node = CreateNode(NODE_KEY_TYPE, value, condition_node, while_body_node);
+        else ERROR
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE     &&
+            VAL_SEP == SEP_R_ROUND_BRACKET   )
+        {
+            TOKEN_NEXT
+        }
+
+        else ERROR
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE)
+        {
+            if (VAL_SEP == SEP_L_FIGURE_BRACKET)
+            {
+                instruction_body = GetBlock(programm_tokens);
+            }
+
+            else if (VAL_SEP == SEP_SEMI_COLON)
+            {
+                instruction_body = nullptr;
+            }
+        }
+
+        else
+        {
+            instruction_body = GetInstruction(programm_tokens);
+        }
     }
 
-    return node;
+    else ERROR
+
+    Value* value = ValueCtor();
+    value->key_val = KEY_WHILE;
+
+    Node* instruction = CreateNode(NODE_KEY_TYPE, value, condition, instruction_body);
+
+    return instruction;
+}
+
+Node* GetIfElseInstructionBody(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* instruction_body = nullptr;
+
+    if (VAL_TYPE == TOKEN_SEP_TYPE)
+    {
+        if (VAL_SEP == SEP_L_FIGURE_BRACKET)
+        {
+            instruction_body = GetBlock(programm_tokens);
+        }
+
+        else if (VAL_SEP == SEP_SEMI_COLON)
+        {
+            instruction_body = nullptr;
+
+            TOKEN_NEXT
+        }
+
+        else ERROR
+
+    }
+
+    else
+    {
+        instruction_body = GetInstruction(programm_tokens);
+    }
+
+    return instruction_body;
 }
 
 Node* GetIfElseInstruction(ProgrammTokens* programm_tokens)
@@ -546,20 +697,111 @@ Node* GetIfElseInstruction(ProgrammTokens* programm_tokens)
     ASSERT(programm_tokens != nullptr)
 
     Node* condition = nullptr;
-    Node* instruction_body = nullptr;
+    Node* if_instruction_body = nullptr;
 
     if (VAL_TYPE == TOKEN_KEY_TYPE &&
         VAL_KEY == KEY_IF            )
     {
+        TOKEN_NEXT
 
+        if (VAL_TYPE == TOKEN_SEP_TYPE     &&
+            VAL_SEP == SEP_L_ROUND_BRACKET   )
+        {
+            TOKEN_NEXT
+
+            condition = GetExpression(programm_tokens);
+            // ShowTree(condition, SIMPLE_DUMP_MODE, 1);
+        }
+
+        else ERROR
+
+        if (VAL_TYPE == TOKEN_SEP_TYPE     &&
+            VAL_SEP == SEP_R_ROUND_BRACKET   )
+        {
+            TOKEN_NEXT
+        }
+
+        else ERROR
+
+        if_instruction_body = GetIfElseInstructionBody(programm_tokens);
     }
 
     else ERROR
 
+    Node* instruction = nullptr;
+
     Value* value = ValueCtor();
     value->key_val = KEY_IF;
 
-    Node* instruction = CreateNode(NODE_KEY_TYPE, value, condition, instruction_body);
+    if (VAL_TYPE == TOKEN_KEY_TYPE &&
+        VAL_KEY == KEY_ELSE           )
+    {
+        TOKEN_NEXT
+
+        Node* else_instruction_body = GetIfElseInstructionBody(programm_tokens);
+
+        Value* else_block_value = ValueCtor();
+        else_block_value->key_val = KEY_ELSE;
+
+        Node* else_block = CreateNode(NODE_KEY_TYPE, else_block_value, if_instruction_body, else_instruction_body);
+
+        instruction = CreateNode(NODE_KEY_TYPE, value, condition, else_block);
+    }
+
+    else
+    {
+        instruction = CreateNode(NODE_KEY_TYPE, value, condition, if_instruction_body);
+    }
+
+    return instruction;
+}
+
+Node* GetIOInstruction(ProgrammTokens* programm_tokens)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* instruction = nullptr;
+
+    if (VAL_TYPE == TOKEN_KEY_TYPE)
+    {
+        Value* value = ValueCtor();
+
+        if (VAL_KEY == KEY_PRINTF)
+
+            value->key_val = KEY_PRINTF;
+
+        else if (VAL_KEY == KEY_SCANF)
+
+            value->key_val = KEY_SCANF;
+
+        else ERROR
+
+        TOKEN_NEXT
+
+        if (VAL_TYPE != TOKEN_SEP_TYPE    ||
+            VAL_SEP != SEP_L_ROUND_BRACKET  )
+        {
+            ERROR
+        }
+
+        TOKEN_NEXT
+
+        Node* IO_params = GetFunctionCallParams(programm_tokens);
+
+        if (VAL_TYPE != TOKEN_SEP_TYPE    ||
+            VAL_SEP != SEP_R_ROUND_BRACKET  )
+        {
+            ERROR
+        }
+
+        TOKEN_NEXT
+
+        CheckForSemiColon(programm_tokens);
+
+        instruction = CreateNode(NODE_KEY_TYPE, value, IO_params, nullptr);
+    }
+
+    else ERROR
 
     return instruction;
 }
@@ -579,6 +821,8 @@ Node* GetFunctionBlock(ProgrammTokens* programm_tokens)
 
         Node* function_block_without_return = GetInstructions(programm_tokens);
         Node* return_statement = nullptr;
+
+        // ShowTree(function_block_without_return, SIMPLE_DUMP_MODE, 1);
 
         if (VAL_TYPE == TOKEN_KEY_TYPE &&
             VAL_KEY  == KEY_RETURN       )

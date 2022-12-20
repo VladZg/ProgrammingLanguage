@@ -1,17 +1,2 @@
-init main ( )
-{
-    // scanf ( init x , init y ) ;
-
-    init z = mul ( ) ;
-
-    // printf ( z ) ;
-
-    return 1 ;
-}
-
-init mul ( init a , init b )    // a function that mulls
-{
-    init result = a * b ;       P.S. just mulling
-
-    return result ;             P.P.S. returning value
-}
+printf ( 1, a , init c = 3 + x / ( 6 - a ) ) ;
+scanf ( y , init z = 2 ) ;

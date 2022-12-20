@@ -41,13 +41,14 @@ int VarDtor(Var** var)
     return 1;
 }
 
-Token* TokenCtor(TokenDataType val_type, Value value)
+Token* TokenCtor(TokenDataType val_type, Value value, size_t str_number)
 {
     Token* token = (Token*) calloc(1, sizeof(Token));
     ASSERT(token != nullptr);
 
     token->val_type = val_type;
     token->value    = value   ;
+    token->str_number = str_number;
 
     return token;
 }
@@ -74,6 +75,7 @@ int TokenDtor(Token** token)
         (*token)->value.num_val = NOT_NUM;
 
     (*token)->val_type = TOKEN_NULL_TYPE;
+    (*token)->str_number = NOT_STRING_NUMBER;
 
     free(*token);
     *token = nullptr;
@@ -186,7 +188,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
 
     for (size_t k = 0; k < programm_tokens->size; k++)
     {
-        fprintf(stdout, " [" KMAG "%03ld" KNRM "] token is ", k);
+        fprintf(stdout, " [" KMAG "%03ld" KNRM "] token on %ld str is ", k, K_TOKEN->str_number);
 
         if (K_TOKEN->val_type == TOKEN_NULL_TYPE)
             fprintf(stdout, KYEL "NULL" KNRM);
@@ -214,7 +216,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
 
         else if (K_TOKEN->val_type == TOKEN_NAME_TYPE)
         {
-            fprintf(stdout, "VARIABLE    " KMAG "%s" KNRM " = " KRED "%lg" KNRM " %s", K_TOKEN->value.var->name, K_TOKEN->value.var->value, (K_TOKEN->value.var->value == VAR_DEAD_VAL ? KBLU "(x.x.DEAD.x.x)" KNRM : ""));
+            fprintf(stdout, "NAME        " KMAG "%s" KNRM " = " KRED "%lg" KNRM " %s", K_TOKEN->value.var->name, K_TOKEN->value.var->value, (K_TOKEN->value.var->value == VAR_DEAD_VAL ? KBLU "(x.x.DEAD.x.x)" KNRM : ""));
         }
 
         else if (K_TOKEN->val_type == TOKEN_NUM_TYPE)
@@ -235,7 +237,7 @@ void ProgrammTokensDump(ProgrammTokens* programm_tokens)
 
 #undef K_TOKEN
 
-int SkipSpaces(char* str, size_t* i_letter)
+int SkipSpaces(char* str, size_t* i_letter, size_t* str_n)
 {
     ASSERT(str != nullptr);
 
@@ -247,6 +249,8 @@ int SkipSpaces(char* str, size_t* i_letter)
 
     while (isspace(*str_ptr))
     {
+        if (*str_ptr == '\n') (*str_n)++;
+
         // fprintf(stdout, "skip\n");
         (*i_letter)++;
         str_ptr++;
@@ -467,6 +471,8 @@ int CheckForEnd(char* programm_code, size_t* i_letter)
 
 #define CUR_TOKEN_NEXT programm_tokens->tokens[programm_tokens->size++]
 
+#define DEF_COMM(comm_beggining_str) !strcmp(comm_beggining_str, strndup(&programm_code_copy[i_letter], strlen(comm_beggining_str))) ||
+
 ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char* programm_code)
 {
     ASSERT(programm_tokens != nullptr);
@@ -479,19 +485,34 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
     size_t max_programm_length = strlen(programm_code_copy);
 
     size_t i_letter = 0;
+    size_t str_n = 1;
     Value token_value = {};
 
     while (programm_code_copy[i_letter] != '\0' && i_letter < max_programm_length)
     {
-        SkipSpaces(&programm_code_copy[i_letter], &i_letter);
-        CheckForComment(&programm_code_copy[i_letter], &i_letter);
-        SkipSpaces(&programm_code_copy[i_letter], &i_letter);
+//         char* comm1 = nullptr;
+//         char* comm2 = nullptr;
+//         char* comm3 = nullptr;
+//
+//         while (!strcmp("P.S",   (comm1 = strndup(&programm_code_copy[i_letter], strlen("P.S"  )))) ||
+//                !strcmp("P.P.S", (comm2 = strndup(&programm_code_copy[i_letter], strlen("P.P.S")))) ||
+//                !strcmp("\\\\",  (comm3 = strndup(&programm_code_copy[i_letter], strlen("\\\\" )))) ||
+//                isspace(programm_code_copy[i_letter]))
+//         {
+            SkipSpaces(&programm_code_copy[i_letter], &i_letter, &str_n);
+            CheckForComment(&programm_code_copy[i_letter], &i_letter);
+            SkipSpaces(&programm_code_copy[i_letter], &i_letter, &str_n);
+
+        //     if (comm1) free((void*) comm1);
+        //     if (comm2) free((void*) comm2);
+        //     if (comm3) free((void*) comm3);
+        // }
 
         token_value.num_val = CheckForNum(&programm_code_copy[i_letter], &i_letter);
 
         if (token_value.num_val != NOT_NUM)
         {
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_NUM_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_NUM_TYPE, token_value, str_n);
             continue;
         }
 
@@ -499,7 +520,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
         if (token_value.op_val != NOT_OP)
         {
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_OP_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_OP_TYPE, token_value, str_n);
             continue;
         }
 
@@ -507,7 +528,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
         if (token_value.key_val != NOT_KEY)
         {
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_KEY_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_KEY_TYPE, token_value, str_n);
             continue;
         }
 
@@ -515,7 +536,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
         if (token_value.sep_val != NOT_SEP)
         {
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_SEP_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_SEP_TYPE, token_value, str_n);
             continue;
         }
 
@@ -524,7 +545,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
         if (var_name != nullptr)
         {
             token_value.var = VarCtor(var_name, VAR_DEAD_VAL);
-            CUR_TOKEN_NEXT = TokenCtor(TOKEN_NAME_TYPE, token_value);
+            CUR_TOKEN_NEXT = TokenCtor(TOKEN_NAME_TYPE, token_value, str_n);
             continue;
         }
 
@@ -533,7 +554,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
     if (CheckForEnd(&programm_code_copy[i_letter], &i_letter))
     {
-        CUR_TOKEN_NEXT = TokenCtor(TOKEN_END_TYPE, token_value);
+        CUR_TOKEN_NEXT = TokenCtor(TOKEN_END_TYPE, token_value, str_n);
     }
 
     programm_tokens->tokens = (Token**) realloc(programm_tokens->tokens, programm_tokens->size * sizeof(Token*));
@@ -547,5 +568,7 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
     return programm_tokens;
 }
+
+#undef DEF_COMM
 
 #undef CUR_TOKEN_NEXT

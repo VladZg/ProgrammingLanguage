@@ -40,7 +40,7 @@ int main()
 
     Node* programm_tree = GetProgramm(programm_tokens);
 
-    // ShowTree(programm_tree, SIMPLE_DUMP_MODE, 0);
+    ShowTree(programm_tree, SIMPLE_DUMP_MODE, 1);
     // ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);

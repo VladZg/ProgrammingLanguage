@@ -7,7 +7,7 @@
 enum Constants
 {
     MAX_NODE_VAL_LEN    = 10,
-    MAX_PROGRAMM_LENGTH = 500,
+    MAX_PROGRAMM_LENGTH = 5000,
 };
 
 #define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name) \
@@ -87,6 +87,7 @@ enum TokenDataType
 enum TokenConstants
 {
     NOT_NUM = 872364,
+    NOT_STRING_NUMBER = 9999999,
 };
 
 enum OpTexPrintModes

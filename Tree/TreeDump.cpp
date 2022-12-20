@@ -39,6 +39,9 @@ static const char* NodeDataType(const Node* node)
     if (node->val_type == NODE_PARAM_TYPE)
         return "PARAMETER";
 
+    if (node->val_type == NODE_CALL_TYPE)
+        return "CALL";
+
     return "EMPTY";
 }
 

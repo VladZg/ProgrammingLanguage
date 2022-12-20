@@ -1,39 +1,36 @@
 { ST
-    { FUNC
-        { "main" { NIL } { Type } }
-        { ST
-            { ST
-                { VAR
-                    { "z" }
-                    { CALL { "mul" } { NIL } }
-                }
-                { NIL }
-            }
-            { RET { 1 } { NIL } }
-        }
-    }
-    { ST
-        { FUNC
-            { "mul"
+    { OUT
+        { PARAM
+            { 1 }
+            { PARAM
+                { "a" }
                 { PARAM
-                    { VAR { "a" } { NIL } }
-                    { PARAM
-                        { VAR { "b" } { NIL } }
-                        { NIL }
-                    }
-                }
-                { Type }
-            }
-            { ST
-                { ST
                     { VAR
-                        { "result" }
-                        { MUL { "a" } { "b" } }
+                        { "c" }
+                        { ADD
+                            { 3 }
+                            { DIV
+                                { "x" }
+                                { SUB { 6 } { "a" } }
+                            }
+                        }
                     }
                     { NIL }
                 }
-                { RET { "result" } { NIL } }
             }
+        }
+        { NIL }
+    }
+    { ST
+        { IN
+            { PARAM
+                { "y" }
+                { PARAM
+                    { VAR { "z" } { 2 } }
+                    { NIL }
+                }
+            }
+            { NIL }
         }
         { NIL }
     }
