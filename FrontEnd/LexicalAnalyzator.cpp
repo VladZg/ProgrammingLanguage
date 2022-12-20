@@ -424,26 +424,33 @@ Separators CheckForSeparator(char* programm_code, size_t* i_letter)
 
 #undef DEF_SEP
 
+#define DEF_COMM(comm_beggining_str)                                           \
+{                                                                              \
+    int comment_begginig_length = strlen(comm_beggining_str);                  \
+                                                                               \
+    char* comment_beggining = strndup(programm_code, comment_begginig_length); \
+                                                                               \
+    if (!strcmp(comm_beggining_str, comment_beggining))                        \
+    {                                                                          \
+        char* comment = strtok(programm_code, "\n");                           \
+                                                                               \
+        int shift = strlen(comment) + 1;                                       \
+        *i_letter += shift;                                                    \
+    }                                                                          \
+                                                                               \
+    free((void*) comment_beggining);                                           \
+}
+
 int CheckForComment(char* programm_code, size_t* i_letter)
 {
     ASSERT(programm_code != nullptr)
 
-    int comment_begginig_length = strlen(COMMENT_BEGINNING);
-
-    char* comment_beggining = strndup(programm_code, comment_begginig_length);
-
-    if (!strcmp(COMMENT_BEGINNING, comment_beggining))
-    {
-        char* comment = strtok(programm_code, "\n");
-
-        int shift = strlen(comment) + 1;
-        *i_letter += shift;
-    }
-
-    free((void*) comment_beggining);
+    #include "../Dictionary/CommentBeginners.h"
 
     return 1;
 }
+
+#undef DEF_COMM
 
 int CheckForEnd(char* programm_code, size_t* i_letter)
 {

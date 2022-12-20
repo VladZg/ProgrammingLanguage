@@ -71,8 +71,6 @@ union Value
     double     num_val;
 };
 
-#define COMMENT_BEGINNING "P.S."
-
 enum TokenDataType
 {
     TOKEN_NULL_TYPE = 0,
