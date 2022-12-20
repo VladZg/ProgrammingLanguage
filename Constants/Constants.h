@@ -62,6 +62,13 @@ enum VarConstants
     VAR_DEAD_VAL = 193726,
 };
 
+enum VarTableConstants
+{
+    MAX_N_VARS = 200,
+    NOT_VAR_INDEX = 9191982,
+    N_VARS_INITIAL = 20,
+};
+
 union Value
 {
     KeyWords   key_val;

@@ -4,6 +4,7 @@
 #undef _DEFINE_SYNTAX_ANALYZATOR_DSL_H_
 
 #undef CUR_TOKEN
+#undef PREV_TOKEN
 #undef NEXT_TOKEN
 #undef TOKEN_NEXT
 

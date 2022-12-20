@@ -1,37 +1,67 @@
 { ST
-    { OUT
-        { PARAM
-            { 1 }
-            { PARAM
-                { "a" }
+    { VAR { "a" } { 3 } }
+    { ST
+        { VAR { "b" } { 4 } }
+        { ST
+            { OUT
                 { PARAM
-                    { VAR
-                        { "c" }
-                        { ADD
-                            { 3 }
-                            { DIV
-                                { "x" }
-                                { SUB { 6 } { "a" } }
-                            }
-                        }
+                    { ADD { "a" } { "b" } }
+                    { NIL }
+                }
+                { NIL }
+            }
+            { ST
+                { IN
+                    { PARAM
+                        { "a" }
+                        { PARAM { "b" } { NIL } }
                     }
                     { NIL }
                 }
-            }
-        }
-        { NIL }
-    }
-    { ST
-        { IN
-            { PARAM
-                { "y" }
-                { PARAM
-                    { VAR { "z" } { 2 } }
-                    { NIL }
+                { ST
+                    { FUNC
+                        { "pow"
+                            { PARAM
+                                { VAR { "x" } { NIL } }
+                                { PARAM
+                                    { VAR { "y" } { NIL } }
+                                    { NIL }
+                                }
+                            }
+                            { Type }
+                        }
+                        { ST
+                            { ST }
+                            { RET
+                                { POW { "x" } { "y" } }
+                                { NIL }
+                            }
+                        }
+                    }
+                    { ST
+                        { VAR
+                            { "powwed" }
+                            { CALL
+                                { "pow"
+                                    { PARAM
+                                        { "a" }
+                                        { PARAM { "b" } { NIL } }
+                                    }
+                                    { NIL }
+                                }
+                                { NIL }
+                            }
+                        }
+                        { ST
+                            { OUT
+                                { PARAM { "powwed" } { NIL } }
+                                { NIL }
+                            }
+                            { NIL }
+                        }
+                    }
                 }
             }
-            { NIL }
         }
-        { NIL }
     }
 }

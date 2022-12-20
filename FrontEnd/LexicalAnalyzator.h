@@ -1,5 +1,5 @@
-#ifndef LEXICAL_ANALYZATOR_H
-#define LEXICAL_ANALYZATOR_H
+#ifndef _LEXICAL_ANALYZATOR_H_
+#define _LEXICAL_ANALYZATOR_H_
 
 #include "../Config.h"
 #include <./stdlib.h>

@@ -16,31 +16,56 @@
 
 #include "./FrontEnd/LexicalAnalyzator.h"
 #include "./FrontEnd/SyntaxAnalyzator.h"
+#include "./FrontEnd/VarTable.h"
 #include "./BackEnd/BackEnd.h"
+
+struct Programm
+{
+    FILE* file;
+    ProgrammTokens* tokens;
+    Node* tree;
+    VarTable* var_table;
+};
 
 int main()
 {
-    FILE* programm_file = fopen("./Programms/programm.vlds", "r");
-    ASSERT(programm_file != nullptr)
+//     VarTable* var_table = VarTableCtor();
+//
+//     char s[10] = {};
+//
+//     for (int i = 40; i < 80; i++)
+//     {
+//         sprintf(s, "%c", (char) i);
+//         AddNewVar(var_table, s, (double) i * 3.33);
+//     }
+//
+//     VarTableDump(var_table);
+//
+//     VarTableDtor(&var_table);
+
+    Programm programm = {};
+
+    programm.var_table = VarTableCtor();
+
+    programm.file = fopen("./Programms/programm.vlds", "r");
+    ASSERT(programm.file != nullptr)
 
     char programm_code[MAX_PROGRAMM_LENGTH] = {};
 
     char* programm_code_ptr = programm_code;
-    fscanf(programm_file, "%[^EOF]s", programm_code_ptr);
+    fscanf(programm.file, "%[^EOF]s", programm_code_ptr);
 
-    fclose(programm_file);
+    fclose(programm.file);
 
-    ProgrammTokens* programm_tokens = ProgrammTokensCtor();
+    programm.tokens = ProgrammTokensCtor();
 
-    AnalyzeProgrammCode(programm_tokens, programm_code);
+    AnalyzeProgrammCode(programm.tokens, programm_code);
 
-    ProgrammTokensDump(programm_tokens);
+    ProgrammTokensDump(programm.tokens);
 
-    // fprintf(stdout, "Выражение: %s\n", programm_code_analyzed);
+    programm.tree = GetProgramm(programm.tokens, programm.var_table);
 
-    Node* programm_tree = GetProgramm(programm_tokens);
-
-    ShowTree(programm_tree, SIMPLE_DUMP_MODE, 1);
+    // ShowTree(programm_tree, SIMPLE_DUMP_MODE, 1);
     // ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);
@@ -50,14 +75,15 @@ int main()
     FILE* standartized_tree_file = fopen("./FrontEnd/StandartizedTree.txt", "w");
     ASSERT(standartized_tree_file != nullptr)
 
-    WriteTreeInStandartForm(programm_tree, standartized_tree_file);
+    WriteTreeInStandartForm(programm.tree, standartized_tree_file);
 
     fclose(standartized_tree_file);
 
-    // ProcessProgramm(programm_tree);
+    // ProcessProgramm(programm.tree);
 
-    ProgrammTokensDtor(&programm_tokens);
-    NodeDtor(&programm_tree);
+    ProgrammTokensDtor(&programm.tokens);
+    VarTableDtor(&programm.var_table);
+    NodeDtor(&programm.tree);
 
     return 1;
 }

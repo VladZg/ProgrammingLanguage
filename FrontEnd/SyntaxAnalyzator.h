@@ -6,36 +6,37 @@
 #include "../Constants/Constants.h"
 #include "../Tree/Tree.h"
 #include "./LexicalAnalyzator.h"
+#include "./VarTable.h"
 
-void SyntaxErrorPrint(const char* function_name, size_t token_cursor, Token* token);
+void ErrorPrint(const char* function_name, const char* error_name, size_t token_cursor, Token* token);
 
-Node* GetProgramm             (ProgrammTokens* programm_tokens); // Считывание всего выражения
-// Node* GetProgrammBody         (ProgrammTokens* programm_tokens);
-Node* GetStatement            (ProgrammTokens* programm_tokens);
-Node* GetProgrammBody         (ProgrammTokens* programm_tokens);
-Node* GetInstructions         (ProgrammTokens* programm_tokens);
-Node* GetKeyInstruction       (ProgrammTokens* programm_tokens);
-Node* GetInstruction          (ProgrammTokens* programm_tokens);
-Node* GetInitialization       (ProgrammTokens* programm_tokens);
-Node* GetAssignment           (ProgrammTokens* programm_tokens);
-Node* GetExpression           (ProgrammTokens* programm_tokens); // Считывание операций +, -
-Node* GetMultiplication       (ProgrammTokens* programm_tokens); // Считывание операций *, /
-Node* GetDegree               (ProgrammTokens* programm_tokens); // Считывание операции ^
-Node* GetPrimaryExpression    (ProgrammTokens* programm_tokens); // Считывание выражений в скобочках (...)
-Node* GetIfElseInstructionBody(ProgrammTokens* programm_tokens);
-Node* GetWhileInstruction     (ProgrammTokens* programm_tokens);
-Node* GetIfElseInstruction    (ProgrammTokens* programm_tokens);
-Node* GetIOInstruction        (ProgrammTokens* programm_tokens);
-Node* GetFunctionBlock        (ProgrammTokens* programm_tokens);
-Node* GetBlock                (ProgrammTokens* programm_tokens);
-Node* GetName                 (ProgrammTokens* programm_tokens);
-Node* GetFunctionDefinition   (ProgrammTokens* programm_tokens);
-Node* GetFunctionInitParam    (ProgrammTokens* programm_tokens);
-Node* GetFunctionInitParams   (ProgrammTokens* programm_tokens);
-Node* GetFunctionCallParam    (ProgrammTokens* programm_tokens);
-Node* GetFunctionCallParams   (ProgrammTokens* programm_tokens);
-Node* GetFunctionCall         (ProgrammTokens* programm_tokens);
-Node* GetNumber               (ProgrammTokens* programm_tokens);
-void CheckForSemiColon        (ProgrammTokens* programm_tokens);
+Node* GetProgramm             (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание всего выражения
+// Node* GetProgrammBody         (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetStatement            (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetProgrammBody         (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetInstructions         (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetKeyInstruction       (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetInstruction          (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetInitialization       (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetAssignment           (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetExpression           (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операций +, -
+Node* GetMultiplication       (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операций *, /
+Node* GetDegree               (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операции ^
+Node* GetPrimaryExpression    (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание выражений в скобочках (...)
+Node* GetIfElseInstructionBody(ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetWhileInstruction     (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetIfElseInstruction    (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetIOInstruction        (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionBlock        (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetBlock                (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetName                 (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionDefinition   (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionInitParam    (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionInitParams   (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionCallParam    (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionCallParams   (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetFunctionCall         (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetNumber               (ProgrammTokens* programm_tokens, VarTable* var_table);
+void CheckForSemiColon        (ProgrammTokens* programm_tokens, VarTable* var_table);
 
 #endif
