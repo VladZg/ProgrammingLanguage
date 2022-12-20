@@ -102,17 +102,17 @@ int NodeVerify(const char* function_name, const Node* node)
             return 0;
         }
 
-        if (node->left)
-        {
-            WarningMessage(function_name, "NODE WITH NAME HAS LEFT SUBNODE");
-            return 0;
-        }
-
-        if (node->right)
-        {
-            WarningMessage(function_name, "NODE WITH NAME HAS RIGHT SUBNODE");
-            return 0;
-        }
+//         if (node->left)
+//         {
+//             WarningMessage(function_name, "NODE WITH NAME HAS LEFT SUBNODE");
+//             return 0;
+//         }
+//
+//         if (node->right)
+//         {
+//             WarningMessage(function_name, "NODE WITH NAME HAS RIGHT SUBNODE");
+//             return 0;
+//         }
     }
 
     else if (node->val_type == NODE_OP_TYPE )
@@ -276,8 +276,8 @@ Node* CopyNode(const Node* node)
 {
     if (node == nullptr) return nullptr;
 
-    Node* left  = CopyNode(node->left);
-    Node* right = CopyNode(node->right);
+    Node* new_left  = CopyNode(node->left);
+    Node* new_right = CopyNode(node->right);
 
     Value* value = ValueCtor();
 
@@ -306,8 +306,7 @@ Node* CopyNode(const Node* node)
         value->var = VarCtor(node->value->var->name, node->value->var->value);
     }
 
-    Node* new_node = CreateNode(node->val_type, value, left, right);
-    new_node->prev = node->prev;
+    Node* new_node = CreateNode(node->val_type, value, new_left, new_right);
 
     return new_node;
 }
@@ -337,7 +336,7 @@ int NodeDtor(Node** node)
     NODE_PTR->left      = nullptr;
     NODE_PTR->right     = nullptr;
     NODE_PTR->prev      = nullptr;
-    NodeIndex--;
+    // NodeIndex--;
 
     free(NODE_PTR);
     *node = nullptr;
@@ -501,7 +500,7 @@ void VarPrint(Var* var, FILE* stream)
 
 void NodeValPrint(const Node* node, FILE* stream)
 {
-    if (node->val_type == NODE_NULL_TYPE)
+    if (!node || node->val_type == NODE_NULL_TYPE)
     {
         fprintf(stream, "NIL");
     }
@@ -563,6 +562,11 @@ void NodeValPrint(const Node* node, FILE* stream)
         fprintf(stream, "CALL");
     }
 
+    else if (node->val_type == NODE_BLOCK_TYPE)
+    {
+        fprintf(stream, "BLOCK");
+    }
+
     else
         WarningMessage(__PRETTY_FUNCTION__, "TYPE OF NODE DATA IS UNKNOWN");
 }
@@ -594,7 +598,7 @@ void TreePreorderPrint(const Node* node, FILE* stream)
 
     if (!node) return;
 
-    fprintf(stream, "(");
+    fprintf(stream, "{ ");
 
     NodeValPrint(node, stream);
 
@@ -602,7 +606,7 @@ void TreePreorderPrint(const Node* node, FILE* stream)
 
     if (node->right) TreePreorderPrint(node->right, stream);
 
-    fprintf(stream, ")");
+    fprintf(stream, " }");
 }
 
 void TreeInorderPrint(const Node* node, FILE* stream)
@@ -649,4 +653,107 @@ void TreePostorderPrint(const Node* node, FILE* stream)
     NodeValPrint(node, stream);
 
     fprintf(stream, ")");
+}
+
+size_t Format_shift = 0;
+
+static void FprintfNSymb(FILE* stream, char symb, size_t n_symb)
+{
+    ASSERT(stream != nullptr);
+
+    for (size_t i = 1; i <= n_symb; i++)
+        fprintf(stream, "%c", symb);
+}
+
+static int NodeSdandartPrint(const Node* node, FILE* stream)
+{
+    ASSERT(stream != nullptr)
+
+    if (!node || node->val_type == NODE_NULL_TYPE)
+        NodeValPrint(node, stream);
+
+    else if (node->val_type == NODE_NAME_TYPE)
+    {
+        fprintf(stream, "\"");
+        NodeValPrint(node, stream);
+        fprintf(stream, "\"");
+    }
+
+    else
+        NodeValPrint(node, stream);
+
+    return 1;
+}
+
+int WriteTreeInStandartForm(const Node* node, FILE* stream)
+{
+    ASSERT(stream != nullptr);
+    ASSERT(node != nullptr);
+    VERIFY_NODE(node);
+
+    FprintfNSymb(stream, ' ', Format_shift);
+
+    fprintf(stream, "{ ");
+
+    NodeSdandartPrint(node, stream);
+
+    if (!(node->left || node->right))
+    {
+        fprintf(stream, " }");
+    }
+
+    else if (TreeDepth(node) == 2)
+    {
+        fprintf(stream, " { ");
+
+        NodeSdandartPrint(node->left, stream);
+
+        fprintf(stream, " } { ");
+
+        NodeSdandartPrint(node->right, stream);
+
+        fprintf(stream, " } }");
+    }
+
+    else if (node != nullptr)
+    {
+        fprintf(stream, "\n");
+        Format_shift += 4;
+
+        if (node->left)
+            WriteTreeInStandartForm(node->left, stream);
+
+        else
+        {
+            FprintfNSymb(stream, ' ', Format_shift);
+            fprintf(stream, "{ ");
+            NodeSdandartPrint(node->left, stream);
+            fprintf(stream, " }");
+        }
+
+        if (Format_shift >= 4) Format_shift -= 4;
+
+        fprintf(stream, "\n");
+        Format_shift += 4;
+
+        if (node->right)
+            WriteTreeInStandartForm(node->right, stream);
+
+        else
+        {
+            FprintfNSymb(stream, ' ', Format_shift);
+            fprintf(stream, "{ ");
+            NodeSdandartPrint(node->right, stream);
+            fprintf(stream, " }");
+        }
+
+        if (Format_shift >= 4) Format_shift -= 4;
+
+        fprintf(stream, "\n");
+
+        FprintfNSymb(stream, ' ', Format_shift);
+        fprintf(stream, "}");
+    }
+
+    return 1;
 }

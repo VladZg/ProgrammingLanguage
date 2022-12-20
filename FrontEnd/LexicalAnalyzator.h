@@ -40,6 +40,7 @@ char*      CheckForVar      (char* programm_code, size_t* i_letter);
 Operators  CheckForOperator (char* programm_code, size_t* i_letter);
 KeyWords   CheckForKeyWord  (char* programm_code, size_t* i_letter);
 Separators CheckForSeparator(char* programm_code, size_t* i_letter);
+int        CheckForComment  (char* programm_code, size_t* i_letter);
 int        CheckForEnd      (char* programm_code, size_t* i_letter);
 
 ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char* programm_code);

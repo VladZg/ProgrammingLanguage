@@ -20,14 +20,15 @@
 
 int main()
 {
-    FILE* file = fopen("./Programms/programm.vlds", "r");
+    FILE* programm_file = fopen("./Programms/programm.vlds", "r");
+    ASSERT(programm_file != nullptr)
 
     char programm_code[MAX_PROGRAMM_LENGTH] = {};
 
     char* programm_code_ptr = programm_code;
-    fscanf(file, "%[^EOF]s", programm_code_ptr);
+    fscanf(programm_file, "%[^EOF]s", programm_code_ptr);
 
-    fclose(file);
+    fclose(programm_file);
 
     ProgrammTokens* programm_tokens = ProgrammTokensCtor();
 
@@ -43,8 +44,15 @@ int main()
     // ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);
-    // TreeInorderPrint(root, stdout);
+    // TreePreorderPrint(programm_tree, stdout);
     // fprintf(stdout, "\n");
+
+    FILE* standartized_tree_file = fopen("./FrontEnd/StandartizedTree.txt", "w");
+    ASSERT(standartized_tree_file != nullptr)
+
+    WriteTreeInStandartForm(programm_tree, standartized_tree_file);
+
+    fclose(standartized_tree_file);
 
     // ProcessProgramm(programm_tree);
 

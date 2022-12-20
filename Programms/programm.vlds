@@ -1,1 +1,17 @@
-aboba = 1 - ( 4 + 9 * kuku ) / 4 ;
+init main ( )
+{
+    P.S. scanf ( init x , init y ) ;
+
+    init z = mul ( ) ;
+
+    P.S. printf ( z ) ;
+
+    return 1 ;
+}
+
+init mul ( init a , init b )    P.S. a function that mulls
+{
+    init result = a * b ;       P.S. just mulling
+
+    return result ;             P.S. returning value
+}

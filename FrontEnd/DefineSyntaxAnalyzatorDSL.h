@@ -2,6 +2,7 @@
 #define _DEFINE_SYNTAX_ANALYZATOR_DSL_H_
 
 #define CUR_TOKEN  programm_tokens->tokens[programm_tokens->cursor]
+#define NEXT_TOKEN programm_tokens->tokens[programm_tokens->cursor + 1]
 #define TOKEN_NEXT programm_tokens->cursor++;
 
 #define VAL_TYPE CUR_TOKEN->val_type

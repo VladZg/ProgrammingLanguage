@@ -424,6 +424,27 @@ Separators CheckForSeparator(char* programm_code, size_t* i_letter)
 
 #undef DEF_SEP
 
+int CheckForComment(char* programm_code, size_t* i_letter)
+{
+    ASSERT(programm_code != nullptr)
+
+    int comment_begginig_length = strlen(COMMENT_BEGINNING);
+
+    char* comment_beggining = strndup(programm_code, comment_begginig_length);
+
+    if (!strcmp(COMMENT_BEGINNING, comment_beggining))
+    {
+        char* comment = strtok(programm_code, "\n");
+
+        int shift = strlen(comment) + 1;
+        *i_letter += shift;
+    }
+
+    free((void*) comment_beggining);
+
+    return 1;
+}
+
 int CheckForEnd(char* programm_code, size_t* i_letter)
 {
     ASSERT(programm_code != nullptr)
@@ -455,6 +476,8 @@ ProgrammTokens* AnalyzeProgrammCode(ProgrammTokens* programm_tokens, const char*
 
     while (programm_code_copy[i_letter] != '\0' && i_letter < max_programm_length)
     {
+        SkipSpaces(&programm_code_copy[i_letter], &i_letter);
+        CheckForComment(&programm_code_copy[i_letter], &i_letter);
         SkipSpaces(&programm_code_copy[i_letter], &i_letter);
 
         token_value.num_val = CheckForNum(&programm_code_copy[i_letter], &i_letter);

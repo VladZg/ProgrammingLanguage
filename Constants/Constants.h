@@ -58,7 +58,7 @@ struct Var
 
 enum VarConstants
 {
-    MAX_VAR_NAME_LEN = 20,
+    MAX_VAR_NAME_LEN = 100,
     VAR_DEAD_VAL = 193726,
 };
 
@@ -70,6 +70,8 @@ union Value
     Var*       var    ;
     double     num_val;
 };
+
+#define COMMENT_BEGINNING "P.S."
 
 enum TokenDataType
 {
@@ -110,6 +112,7 @@ enum NodeDataType
     NODE_ST_TYPE      ,
     NODE_FUNC_TYPE    ,
     NODE_CALL_TYPE    ,
+    NODE_BLOCK_TYPE   ,
 };
 
 enum TreeDumpModes

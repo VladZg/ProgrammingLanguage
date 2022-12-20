@@ -1,0 +1,40 @@
+{ ST
+    { FUNC
+        { "main" { NIL } { Type } }
+        { ST
+            { ST
+                { VAR
+                    { "z" }
+                    { CALL { "mul" } { NIL } }
+                }
+                { NIL }
+            }
+            { RET { 1 } { NIL } }
+        }
+    }
+    { ST
+        { FUNC
+            { "mul"
+                { PARAM
+                    { VAR { "a" } { NIL } }
+                    { PARAM
+                        { VAR { "b" } { NIL } }
+                        { NIL }
+                    }
+                }
+                { Type }
+            }
+            { ST
+                { ST
+                    { VAR
+                        { "result" }
+                        { MUL { "a" } { "b" } }
+                    }
+                    { NIL }
+                }
+                { RET { "result" } { NIL } }
+            }
+        }
+        { NIL }
+    }
+}
