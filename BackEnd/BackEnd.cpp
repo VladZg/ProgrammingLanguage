@@ -288,12 +288,12 @@ int TranslateComprasionToAsm(const Node* expression, FILE* asm_file)
 
         else if (VAL_OP == OP_IS_GE)
         {
-            ASM_PRINT("JASE");
+            ASM_PRINT("JAE");
         }
 
         else if (VAL_OP == OP_IS_BE)
         {
-            ASM_PRINT("JJBE");
+            ASM_PRINT("JBE");
         }
 
         else if (VAL_OP == OP_IS_GT)

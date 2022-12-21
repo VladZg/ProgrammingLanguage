@@ -1,119 +1,104 @@
 { ST
     { FUNC
-        { "main"
+        { "rec_fuck"
             { PARAM
-                { VAR { "k" } { NIL } }
+                { VAR { "n" } { NIL } }
                 { NIL }
             }
             { Type }
         }
         { ST
-            { FUNC
-                { "rec_fuck"
-                    { PARAM
-                        { VAR { "n" } { NIL } }
-                        { NIL }
-                    }
-                    { Type }
-                }
-                { ST
-                    { IF
-                        { IS_BT { "n" } { 1 } }
-                        { ELSE
-                            { ST
-                                { EXIT }
-                                { ST
-                                    { OUT
-                                        { PARAM { 1.33723e+08 } { NIL } }
-                                        { NIL }
-                                    }
-                                    { NIL }
-                                }
-                            }
-                            { ST
-                                { IF
-                                    { IS_EE { "n" } { 1 } }
-                                    { ELSE
-                                        { ST
-                                            { RET { 1 } { NIL } }
-                                            { NIL }
-                                        }
-                                        { ST
-                                            { RET
-                                                { MUL
-                                                    { "n" }
-                                                    { CALL
-                                                        { "rec_fuck"
-                                                            { PARAM
-                                                                { SUB { "n" } { 1 } }
-                                                                { NIL }
-                                                            }
-                                                            { NIL }
-                                                        }
-                                                        { NIL }
-                                                    }
-                                                }
-                                                { NIL }
-                                            }
-                                            { NIL }
-                                        }
-                                    }
-                                }
-                                { NIL }
-                            }
-                        }
-                    }
-                    { NIL }
-                }
-            }
-            { ST
-                { IN
-                    { PARAM
-                        { VAR { "n" } { 0 } }
-                        { NIL }
-                    }
-                    { NIL }
-                }
-                { ST
-                    { VAR
-                        { "fuck" }
-                        { CALL
-                            { "rec_fuck"
-                                { PARAM { "n" } { NIL } }
+            { IF
+                { IS_BT { "n" } { 1 } }
+                { ELSE
+                    { ST
+                        { EXIT }
+                        { ST
+                            { OUT
+                                { PARAM { 1.33723e+08 } { NIL } }
                                 { NIL }
                             }
                             { NIL }
                         }
                     }
                     { ST
-                        { OUT
-                            { PARAM
-                                { DIV { "fuck" } { "k" } }
-                                { NIL }
+                        { IF
+                            { IS_EE { "n" } { 1 } }
+                            { ELSE
+                                { ST
+                                    { RET { 1 } { NIL } }
+                                    { NIL }
+                                }
+                                { ST
+                                    { RET
+                                        { MUL
+                                            { "n" }
+                                            { CALL
+                                                { "rec_fuck"
+                                                    { PARAM
+                                                        { SUB { "n" } { 1 } }
+                                                        { NIL }
+                                                    }
+                                                    { NIL }
+                                                }
+                                                { NIL }
+                                            }
+                                        }
+                                        { NIL }
+                                    }
+                                    { NIL }
+                                }
                             }
-                            { NIL }
                         }
                         { NIL }
                     }
                 }
             }
+            { NIL }
         }
     }
     { ST
         { IN
             { PARAM
-                { VAR { "k" } { 1 } }
+                { VAR { "is_going" } { 1 } }
                 { NIL }
             }
             { NIL }
         }
         { ST
-            { CALL
-                { "main"
-                    { PARAM { "k" } { NIL } }
-                    { NIL }
+            { WHILE
+                { IS_NE { "is_going" } { 0 } }
+                { ST
+                    { IN
+                        { PARAM
+                            { VAR { "number" } { 0 } }
+                            { NIL }
+                        }
+                        { NIL }
+                    }
+                    { ST
+                        { OUT
+                            { PARAM
+                                { CALL
+                                    { "rec_fuck"
+                                        { PARAM { "number" } { NIL } }
+                                        { NIL }
+                                    }
+                                    { NIL }
+                                }
+                                { NIL }
+                            }
+                            { NIL }
+                        }
+                        { ST
+                            { IN
+                                { PARAM { "is_going" } { NIL } }
+                                { NIL }
+                            }
+                            { NIL }
+                        }
+                    }
                 }
-                { NIL }
             }
             { NIL }
         }

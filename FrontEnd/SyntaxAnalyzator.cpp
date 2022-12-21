@@ -241,7 +241,8 @@ Node* GetPrimaryExpression(ProgrammTokens* programm_tokens, VarTable* var_table)
     else if (VAL_TYPE == TOKEN_OP_TYPE &&
             (VAL_OP == OP_SIN          ||
              VAL_OP == OP_COS          ||
-             VAL_OP == OP_SQRT           ))
+             VAL_OP == OP_SQRT         ||
+             VAL_OP == OP_TAN            ))
     {
         Value* function_value = ValueCtor();
         function_value->op_val = VAL_OP;

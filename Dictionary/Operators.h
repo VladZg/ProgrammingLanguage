@@ -18,3 +18,5 @@ DEF_OP(15, IS_BT, "<"    , "IS_BT", "menshe"                 )
 DEF_OP(16, IS_NE, "!="   , "IS_NE", "ne_ravno"               )
 DEF_OP(17, OR   , "||"   , "OR"   , "ili"                    )
 DEF_OP(18, AND  , "&&"   , "AND"  , "eeeee"                  )
+
+DEF_OP(19, TAN  , "tan"  , "TAN"  , "tangentss"              )
