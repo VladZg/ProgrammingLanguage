@@ -330,6 +330,19 @@ Node* GetInstruction(ProgrammTokens* programm_tokens, VarTable* var_table)
         {
             instruction = GetReturnInstruction(programm_tokens, var_table);
         }
+
+        else if (VAL_KEY == KEY_EXIT)
+        {
+            TOKEN_NEXT
+
+            CheckForSemiColon
+
+            Value* value = ValueCtor();
+            value->key_val = KEY_EXIT;
+            instruction = CreateNode(NODE_KEY_TYPE, value, nullptr, nullptr);
+        }
+
+        else SYNTAX_ERROR
     }
 
     else if (VAL_TYPE == TOKEN_NAME_TYPE)

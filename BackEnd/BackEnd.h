@@ -20,7 +20,9 @@ int TranslateIfElseToAsm(const Node* assignment, FILE* asm_file, Stack* stack_of
 int TranslateWhileToAsm(const Node* instruction, FILE* asm_file, Stack* stack_of_calls);
 int TranslateIOInAsm(const Node* instruction, FILE* asm_file);
 int TranslateIntputToAsm(const Node* param, FILE* asm_file);
+int TranslateFunctionCallParamsToAsm(const Node* param, FILE* asm_file);
 int TranslateOutputToAsm(const Node* param, FILE* asm_file);
+int TranslateFunctionInitParamsToAsm(const Node* param, FILE* asm_file);
 
 int  PrintInAsm(FILE* asm_file, const char* fmt_text, ...);
 

@@ -158,7 +158,17 @@ int TranslateProgrammBodyToAsm(const Node* programm_tree, FILE* asm_file)
             ASM_CMD_PRINT(asm_func_ret_cmd_str, "RET")
             ASM_COMMENT_PRINT(asm_func_ret_cmd_str, "\\\\<--- function return statement")
         }
+
+        else if (programm_tree->left->value->key_val == KEY_EXIT)
+        {
+            ASM_PRINT("exit case here\n")
+            char asm_func_exit_cmd_str[MAX_ASM_CMD_LENGTH] = {};
+            ASM_CMD_PRINT(asm_func_exit_cmd_str, "EXIT")
+            ASM_COMMENT_PRINT(asm_func_exit_cmd_str, "\\\\<--- programm exit statement")
+        }
     }
+
+    else ASM_PRINT("empty block\n")
 
     // ASM_PRINT("                               \\\\ <---- finished here\n\n") //%ld statement , N_statement++)
 
@@ -192,6 +202,16 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
     ASSERT(asm_file != nullptr)
 
     if (!expression) return 0;
+
+    if (expression->val_type == NODE_CALL_TYPE)// &&  // нужна проверка на возвращаемое значение
+             //expression->left->left == nullptr        ) //считывание только функций без параметров
+    {
+        // ASM_PRINT("\n\nHERE\n\n")
+        TranslateFunctionCallToAsm(expression, asm_file);
+        // ASM_PRINT("\n\nHERE\n\n")
+
+        return 1;
+    }
 
     if (expression->left)
         TranslateExpressionToAsm(expression->left , asm_file);
@@ -234,12 +254,6 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
                 #include "../Dictionary/Operators.h"
             }
         }
-    }
-
-    else if (expression->val_type == NODE_CALL_TYPE &&
-             expression->left->left == nullptr        )
-    {
-        TranslateFunctionCallToAsm(expression, asm_file);
     }
 
     else if (expression->val_type == NODE_NAME_TYPE      &&
@@ -360,6 +374,11 @@ int TranslateFunctionInitializationToAsm(const Node* instruction, FILE* asm_file
     ASM_CMD_PRINT(asm_func_init_cmd_str, "func_%s:", instruction->left->value->var->name)
     ASM_COMMENT_PRINT(asm_func_init_cmd_str, "\\\\ <-- function %s initialization", instruction->left->value->var->name)
 
+    if (instruction->left->left)
+    {
+        TranslateFunctionInitParamsToAsm(instruction->left->left, asm_file);
+    }
+
     TranslateProgrammBodyToAsm(instruction->right, asm_file);
 
 //     char asm_func_ret_cmd_str[MAX_ASM_CMD_LENGTH] = {};
@@ -367,7 +386,7 @@ int TranslateFunctionInitializationToAsm(const Node* instruction, FILE* asm_file
 //     ASM_CMD_PRINT(asm_func_ret_cmd_str, "RET")
     // ASM_COMMENT_PRINT(asm_func_ret_cmd_str, "\\\\ <-- function %s return statement", instruction->left->value->var->name)
 
-    ASM_PRINT("skip_func_%s_def:\n", instruction->left->value->var->name)
+    ASM_PRINT("\nskip_func_%s_def:\n", instruction->left->value->var->name)
 
     return 1;
 }
@@ -379,6 +398,15 @@ int TranslateFunctionCallToAsm(const Node* call, FILE* asm_file)
     if (!call                            ||
         call->val_type != NODE_CALL_TYPE   )
         return 0;
+
+    // ASM_PRINT("\n\nHERE\n\n")
+
+    if (call->left->left)
+    {
+        TranslateFunctionCallParamsToAsm(call->left->left, asm_file);
+    }
+
+    // ASM_PRINT("\n\nHERE\n\n")
 
     char asm_func_call_cmd_str[MAX_ASM_CMD_LENGTH] = {};
     ASM_CMD_PRINT(asm_func_call_cmd_str, "CALL :func_%s", call->left->value->var->name)
@@ -400,7 +428,7 @@ int TranslateAssignmentToAsm(const Node* assignment, FILE* asm_file)
 
     char asm_cmd_str[MAX_ASM_CMD_LENGTH] = {};
 
-    ASM_CMD_PRINT(asm_cmd_str, "pop [%d + %s]", (int) assignment->left->value->var->value, VARS_REG)
+    ASM_CMD_PRINT(asm_cmd_str, "POP [%d + %s]", (int) assignment->left->value->var->value, VARS_REG)
     ASM_COMMENT_PRINT(asm_cmd_str, "\\\\ var's %s value changed", assignment->left->value->var->name)
 
     return 1;
@@ -595,5 +623,51 @@ int TranslateOutputToAsm(const Node* param, FILE* asm_file)
 
     return 1;
 }
+
+int TranslateFunctionCallParamsToAsm(const Node* param, FILE* asm_file)
+{
+    ASSERT(asm_file != nullptr)
+
+    if (!param || param->val_type != NODE_PARAM_TYPE) return 1;
+
+    TranslateExpressionToAsm(param->left, asm_file);
+
+    if (param->right)
+    {
+        TranslateFunctionCallParamsToAsm(param->right, asm_file);
+    }
+
+    ASM_PRINT("                               \\\\ <--- initializing function params\n")
+
+    return 1;
+}
+
+int TranslateFunctionInitParamsToAsm(const Node* param, FILE* asm_file)
+{
+    ASSERT(asm_file != nullptr)
+
+    if (!param || param->val_type != NODE_PARAM_TYPE) return 1;
+
+    Node* name_node = nullptr;
+
+    if (param->left->val_type == NODE_VAR_TYPE)
+    {
+        name_node = param->left->left;
+
+        char asm_print_param_cmd_str[MAX_ASM_CMD_LENGTH] = {};
+        ASM_CMD_PRINT(asm_print_param_cmd_str,"POP [%d + %s]", (int) name_node->value->var->value, VARS_REG)
+        ASM_COMMENT_PRINT(asm_print_param_cmd_str, "\\\\ <-- initialization of intern variable %s", name_node->value->var->name)
+    }
+
+    else return 0;
+
+    if (param->right)
+    {
+        TranslateFunctionInitParamsToAsm(param->right, asm_file);
+    }
+
+    return 1;
+}
+
 
 #undef VARS_REG
