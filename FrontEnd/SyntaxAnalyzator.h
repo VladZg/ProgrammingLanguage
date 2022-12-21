@@ -19,7 +19,8 @@ Node* GetKeyInstruction       (ProgrammTokens* programm_tokens, VarTable* var_ta
 Node* GetInstruction          (ProgrammTokens* programm_tokens, VarTable* var_table);
 Node* GetInitialization       (ProgrammTokens* programm_tokens, VarTable* var_table);
 Node* GetAssignment           (ProgrammTokens* programm_tokens, VarTable* var_table);
-Node* GetExpression           (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операций +, -
+Node* GetExpression           (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetAddSub               (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операций +, -
 Node* GetMultiplication       (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операций *, /
 Node* GetDegree               (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание операции ^
 Node* GetPrimaryExpression    (ProgrammTokens* programm_tokens, VarTable* var_table); // Считывание выражений в скобочках (...)

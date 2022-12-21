@@ -1,22 +1,16 @@
 scanf ( init x = 0 , init y = 0 ) ;
 init z = 0 ;
 
-printf ( sin ( 1500 ) , cos ( 3141 ) ) ;
+printf ( sin ( 1571 ) , cos ( 3141 ) ) ;
 
 init mul ( )
 {
-    z = x * y ;
-
-    init pow ( )
-    {
-        z = x ^ y ;
-    }
+    return x * y ;
 }
 
-mul ( ) ;
+init pow ( )
+{
+    return x ^ y ;
+}
 
-printf ( z ) ;
-
-pow ( ) ;
-
-printf ( z ) ;
+printf ( pow ( ) , mul ( ) , pow ( ) / mul ( ) ) ;

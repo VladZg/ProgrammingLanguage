@@ -11,6 +11,7 @@ int ProcessProgramm(const Node* node);
 int TranslateProgrammTreeToAsm(const Node* node, FILE* asm_file);
 int TranslateProgrammBodyToAsm(const Node* programm_tree, FILE* asm_file);
 int TranslateExpressionToAsm(const Node* programm_tree, FILE* asm_file);
+int TranslateComprasionToAsm(const Node* instruction, FILE* asm_file);
 int TranslateVarInitializationToAsm(const Node* instruction, FILE* asm_file);
 int TranslateFunctionInitializationToAsm(const Node* instruction, FILE* asm_file);
 int TranslateFunctionCallToAsm(const Node* call, FILE* asm_file);

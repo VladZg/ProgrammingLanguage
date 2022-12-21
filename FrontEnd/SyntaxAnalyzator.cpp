@@ -68,7 +68,7 @@ Node* GetProgrammBody(ProgrammTokens* programm_tokens, VarTable* var_table)
     return programm_body;
 }
 
-Node* GetExpression(ProgrammTokens* programm_tokens, VarTable* var_table)
+Node* GetAddSub(ProgrammTokens* programm_tokens, VarTable* var_table)
 {
     ASSERT(programm_tokens != nullptr)
 
@@ -94,6 +94,53 @@ Node* GetExpression(ProgrammTokens* programm_tokens, VarTable* var_table)
     }
 
     return node;
+}
+
+Node* GetExpression(ProgrammTokens* programm_tokens, VarTable* var_table)
+{
+    ASSERT(programm_tokens != nullptr)
+
+    Node* expression = GetAddSub(programm_tokens, var_table);
+
+    if (VAL_TYPE == TOKEN_OP_TYPE)
+    {
+        Value* value = ValueCtor();
+
+             if (VAL_OP == OP_IS_EE)
+            value->op_val = OP_IS_EE;
+
+        else if (VAL_OP == OP_IS_GE)
+            value->op_val = OP_IS_GE;
+
+        else if (VAL_OP == OP_IS_BE)
+            value->op_val = OP_IS_BE;
+
+        else if (VAL_OP == OP_IS_GT)
+            value->op_val = OP_IS_GT;
+
+        else if (VAL_OP == OP_IS_BT)
+            value->op_val = OP_IS_BT;
+
+        else if (VAL_OP == OP_IS_NE)
+            value->op_val = OP_IS_NE;
+
+        else if (VAL_OP == OP_OR)
+            value->op_val = OP_OR;
+
+        else if (VAL_OP == OP_AND)
+            value->op_val = OP_AND;
+
+        else SYNTAX_ERROR
+
+        TOKEN_NEXT
+
+        Node* left_expression = expression;
+        Node* right_expression = GetAddSub(programm_tokens, var_table);
+
+        expression = CreateNode(NODE_OP_TYPE, value, left_expression, right_expression);
+    }
+
+    return expression;
 }
 
 Node* GetMultiplication(ProgrammTokens* programm_tokens, VarTable* var_table)

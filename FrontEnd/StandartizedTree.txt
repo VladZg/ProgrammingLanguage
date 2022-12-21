@@ -1,103 +1,31 @@
 { ST
-    { FUNC
-        { "while_fuck" { NIL } { Type } }
-        { ST
-            { IN
-                { PARAM
-                    { VAR { "n" } { 1 } }
-                    { NIL }
-                }
-                { NIL }
-            }
-            { ST
-                { VAR { "fuck" } { "n" } }
-                { ST
-                    { WHILE
-                        { SUB { "n" } { 1 } }
-                        { ST
-                            { EQ
-                                { "n" }
-                                { SUB { "n" } { 1 } }
-                            }
-                            { ST
-                                { EQ
-                                    { "fuck" }
-                                    { MUL { "fuck" } { "n" } }
-                                }
-                                { NIL }
-                            }
-                        }
-                    }
-                    { ST
-                        { OUT
-                            { PARAM { "fuck" } { NIL } }
-                            { NIL }
-                        }
-                        { ST
-                            { RET { 1 } { NIL } }
-                            { NIL }
-                        }
-                    }
-                }
-            }
+    { VAR
+        { "a" }
+        { IS_GT
+            { 12 }
+            { SUB { 4 } { 33 } }
         }
     }
     { ST
-        { FUNC
-            { "rec_fuck"
-                { PARAM
-                    { VAR { "n" } { NIL } }
-                    { NIL }
-                }
-                { Type }
-            }
-            { ST
-                { IF
-                    { SUB { "n" } { 1 } }
-                    { ELSE
-                        { ST
-                            { RET { 1 } { NIL } }
-                            { NIL }
-                        }
-                        { ST
-                            { RET
-                                { MUL
-                                    { "n" }
-                                    { CALL
-                                        { "rec_fuck"
-                                            { PARAM { "n" } { NIL } }
-                                            { NIL }
-                                        }
-                                        { NIL }
-                                    }
-                                }
-                                { NIL }
-                            }
-                            { NIL }
-                        }
-                    }
-                }
-                { NIL }
+        { VAR
+            { "b" }
+            { IS_BT
+                { SUB { "a" } { 4 } }
+                { 8 }
             }
         }
         { ST
-            { VAR { "inp" } { 1 } }
-            { ST
-                { WHILE
-                    { "inp" }
-                    { ST
-                        { CALL { "while_fuck" } { NIL } }
-                        { ST
-                            { IN
-                                { PARAM { "inp" } { NIL } }
-                                { NIL }
-                            }
-                            { NIL }
-                        }
+            { IF
+                { IS_EE { "a" } { "b" } }
+                { ST
+                    { OUT
+                        { PARAM { 999 } { NIL } }
+                        { NIL }
                     }
+                    { NIL }
                 }
-                { NIL }
             }
+            { NIL }
         }
     }
 }

@@ -148,6 +148,16 @@ int TranslateProgrammBodyToAsm(const Node* programm_tree, FILE* asm_file)
             TranslateIOInAsm(programm_tree->left, asm_file);
             ASM_PRINT("                               \\\\ <---- input/output finished here\n\n")
         }
+
+        else if (programm_tree->left->value->key_val == KEY_RETURN)
+        {
+            ASM_PRINT("function return statement starts here\n")
+            TranslateExpressionToAsm(programm_tree->left->left, asm_file);
+
+            char asm_func_ret_cmd_str[MAX_ASM_CMD_LENGTH] = {};
+            ASM_CMD_PRINT(asm_func_ret_cmd_str, "RET")
+            ASM_COMMENT_PRINT(asm_func_ret_cmd_str, "\\\\<--- function return statement")
+        }
     }
 
     // ASM_PRINT("                               \\\\ <---- finished here\n\n") //%ld statement , N_statement++)
@@ -158,15 +168,24 @@ int TranslateProgrammBodyToAsm(const Node* programm_tree, FILE* asm_file)
     return 0;
 }
 
-#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)       \
-    case OP_##op_name:                                             \
-            {                                                      \
-                char asm_cmd_str[MAX_ASM_CMD_LENGTH] = {};         \
-                ASM_CMD_PRINT(asm_cmd_str, "%s", #op_name)         \
-                ASM_COMMENT_PRINT(asm_cmd_str, "\\\\ %sING",       \
-                                                #op_name)          \
-                break;                                             \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name, op_kryzh_name) \
+    case OP_##op_name:                                                      \
+            {                                                               \
+                char asm_cmd_str[MAX_ASM_CMD_LENGTH] = {};                  \
+                ASM_CMD_PRINT(asm_cmd_str, "%s", #op_name)                  \
+                ASM_COMMENT_PRINT(asm_cmd_str, "\\\\ %sING",                \
+                                                #op_name)                   \
+                break;                                                      \
             }
+
+#define IS_COMPRASION (expression->value->op_val == OP_IS_EE ||  \
+                       expression->value->op_val == OP_IS_NE ||  \
+                       expression->value->op_val == OP_IS_GE ||  \
+                       expression->value->op_val == OP_IS_BE ||  \
+                       expression->value->op_val == OP_IS_GT ||  \
+                       expression->value->op_val == OP_IS_BT ||  \
+                       expression->value->op_val == OP_OR    ||  \
+                       expression->value->op_val == OP_AND     )
 
 int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
 {
@@ -200,9 +219,17 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
 
     else if (expression->val_type == NODE_OP_TYPE)
     {
-        switch (expression->value->op_val)
+        if (IS_COMPRASION)
         {
-            #include "../Dictionary/Operators.h"
+            TranslateComprasionToAsm(expression, asm_file);
+        }
+
+        else
+        {
+            switch (expression->value->op_val)
+            {
+                #include "../Dictionary/Operators.h"
+            }
         }
     }
 
@@ -212,7 +239,8 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
         TranslateFunctionCallToAsm(expression, asm_file);
     }
 
-    else if (expression->val_type == NODE_NAME_TYPE)
+    else if (expression->val_type == NODE_NAME_TYPE      &&
+             expression->prev->val_type != NODE_CALL_TYPE  )
     {
         char asm_cmd_str[MAX_ASM_CMD_LENGTH] = {};
         ASM_CMD_PRINT(asm_cmd_str, "PUSH [%d + %s]", (int) expression->value->var->value, VARS_REG)
@@ -222,6 +250,58 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
     return 0;
 }
 
+#define VAL_OP comprasion->value->op_val
+
+int TranslateComprasionToAsm(const Node* comprasion, FILE* asm_file)
+{
+    ASSERT(asm_file != nullptr)
+
+    if (!comprasion) return 0;
+
+        if (VAL_OP == OP_IS_EE)
+    {
+
+    }
+
+    else if (VAL_OP == OP_IS_GE)
+    {
+
+    }
+
+    else if (VAL_OP == OP_IS_BE)
+    {
+
+    }
+
+    else if (VAL_OP == OP_IS_GT)
+    {
+
+    }
+
+    else if (VAL_OP == OP_IS_BT)
+    {
+
+    }
+
+    else if (VAL_OP == OP_IS_NE)
+    {
+
+    }
+
+    else if (VAL_OP == OP_OR)
+    {
+
+    }
+
+    else if (VAL_OP == OP_AND)
+    {
+
+    }
+
+    return 1;
+}
+
+#undef IS_COMPRASION
 #undef DEF_OP
 
 int TranslateVarInitializationToAsm(const Node* instruction, FILE* asm_file)
@@ -264,10 +344,10 @@ int TranslateFunctionInitializationToAsm(const Node* instruction, FILE* asm_file
 
     TranslateProgrammBodyToAsm(instruction->right, asm_file);
 
-    char asm_func_ret_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-
-    ASM_CMD_PRINT(asm_func_ret_cmd_str, "RET")
-    ASM_COMMENT_PRINT(asm_func_ret_cmd_str, "\\\\ <-- function %s return statement", instruction->left->value->var->name)
+//     char asm_func_ret_cmd_str[MAX_ASM_CMD_LENGTH] = {};
+//
+//     ASM_CMD_PRINT(asm_func_ret_cmd_str, "RET")
+    // ASM_COMMENT_PRINT(asm_func_ret_cmd_str, "\\\\ <-- function %s return statement", instruction->left->value->var->name)
 
     ASM_PRINT("skip_func_%s_def:\n", instruction->left->value->var->name)
 
@@ -330,7 +410,8 @@ int TranslateIfElseToAsm(const Node* instruction, FILE* asm_file, Stack* stack_o
 
     if (instruction->right)
     {
-        if (!instruction->right->right)
+        if (instruction->right->val_type != NODE_KEY_TYPE ||
+            instruction->right->value->key_val != KEY_ELSE  )
         {
             ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
 
@@ -344,6 +425,8 @@ int TranslateIfElseToAsm(const Node* instruction, FILE* asm_file, Stack* stack_o
         else
         {
             ASM_PRINT("JMP :else_block_%d\n\n", N_conditional_construction)
+
+            // ShowTree(instruction->right->left, SIMPLE_DUMP_MODE, 1);
 
             char asm_if_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
             ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%d:", N_conditional_construction)

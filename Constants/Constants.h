@@ -10,7 +10,7 @@ enum Constants
     MAX_PROGRAMM_LENGTH = 5000,
 };
 
-#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name) \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name, sep_kryzh_name) \
     KEY_##key_name = key_code,
 
 enum KeyWords
@@ -21,7 +21,7 @@ enum KeyWords
 
 #undef DEF_KEY
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name) \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name, key_kryzh_name) \
     SEP_##sep_name = sep_code,
 
 enum Separators
@@ -32,7 +32,7 @@ enum Separators
 
 #undef DEF_SEP
 
-#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name) \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name, op_kryzh_name) \
     OP_##op_name = op_code,
 
 enum Operators

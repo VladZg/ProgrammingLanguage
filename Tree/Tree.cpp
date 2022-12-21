@@ -418,8 +418,8 @@ size_t TreeNumberOfNodes(const Node* node)
     return 1 + TreeNumberOfNodes(node->left) + TreeNumberOfNodes(node->right);
 }
 
-#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)      \
-    if (!strcasecmp(node_val, op_lang_name)) return OP_##op_name; \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name, op_kryzh_name)      \
+    if (!strcasecmp(node_val, op_lang_name)) return OP_##op_name;                \
     else
 
 Operators IsOperator(const char* node_val)
@@ -431,8 +431,8 @@ Operators IsOperator(const char* node_val)
 
 #undef DEF_OP
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name)     \
-    if (!strcasecmp(node_val, sep_lang_name)) return SEP_##sep_name;  \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name, sep_kryzh_name)     \
+    if (!strcasecmp(node_val, sep_lang_name)) return SEP_##sep_name;                  \
     else
 
 Separators IsSeparator(const char* node_val)
@@ -444,8 +444,8 @@ Separators IsSeparator(const char* node_val)
 
 #undef DEF_SEP
 
-#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)    \
-    if (!strcasecmp(node_val, key_lang_name)) return KEY_##key_name; \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name, key_kryzh_name)    \
+    if (!strcasecmp(node_val, key_lang_name)) return KEY_##key_name;                 \
     else
 
 KeyWords IsKeyWord(const char* node_val)
@@ -457,7 +457,7 @@ KeyWords IsKeyWord(const char* node_val)
 
 #undef DEF_KEY
 
-#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name)             \
+#define DEF_OP(op_code, op_name, op_lang_name, op_tree_name, op_kryzh_name)  \
     if (code == OP_##op_name) { fprintf(stream, op_tree_name); return; }
 
 void OperatorPrint(Operators code, FILE* stream)
@@ -469,7 +469,7 @@ void OperatorPrint(Operators code, FILE* stream)
 
 #undef DEF_OP
 
-#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name)           \
+#define DEF_SEP(sep_code, sep_name, sep_lang_name, sep_tree_name, sep_kryzh_name) \
     if (code == SEP_##sep_name) { fprintf(stream, sep_tree_name); return; }
 
 void SeparatorPrint(Separators code, FILE* stream)
@@ -481,7 +481,7 @@ void SeparatorPrint(Separators code, FILE* stream)
 
 #undef DEF_SEP
 
-#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)           \
+#define DEF_KEY(key_code, key_name, key_lang_name, key_tree_name, key_kryzh_name) \
     if (code == KEY_##key_name) { fprintf(stream, key_tree_name); return; }
 
 void KeyWordPrint(KeyWords code, FILE* stream)
