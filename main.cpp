@@ -47,7 +47,7 @@ int main()
 
     programm.var_table = VarTableCtor();
 
-    programm.file = fopen("./Programms/programm.vlds", "r");
+    programm.file = fopen("./Programms/fuck.vlds", "r");
     ASSERT(programm.file != nullptr)
 
     char programm_code[MAX_PROGRAMM_LENGTH] = {};
@@ -65,7 +65,7 @@ int main()
 
     programm.tree = GetProgramm(programm.tokens, programm.var_table);
 
-    // ShowTree(programm_tree, SIMPLE_DUMP_MODE, 1);
+    ShowTree(programm.tree, SIMPLE_DUMP_MODE, 1);
     // ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);

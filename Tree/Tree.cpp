@@ -123,17 +123,17 @@ int NodeVerify(const char* function_name, const Node* node)
             return 0;
         }
 
-        if (!node->left)
-        {
-            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE LEFT SUBNODE", node->value->op_val);
-            return 0;
-        }
-
-        if (!node->right)
-        {
-            WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value->op_val);
-            return 0;
-        }
+//         if (!node->left)
+//         {
+//             WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE LEFT SUBNODE", node->value->op_val);
+//             return 0;
+//         }
+//
+//         if (!node->right)
+//         {
+//             WarningMessage(function_name, "NODE WITH OPERATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value->op_val);
+//             return 0;
+//         }
     }
 
     else if (node->val_type == NODE_SEP_TYPE )
@@ -144,17 +144,17 @@ int NodeVerify(const char* function_name, const Node* node)
             return 0;
         }
 
-//         if (!node->left)
-//         {
-//             WarningMessage(function_name, "NODE WITH SEPARATOR %d DOESN'T HAVE LEFT SUBNODE", node->value.sep_val);
-//             return 0;
-//         }
-//
-//         if (!node->right)
-//         {
-//             WarningMessage(function_name, "NODE WITH SEPARATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value.sep_val);
-//             return 0;
-//         }
+        if (!node->left)
+        {
+            WarningMessage(function_name, "NODE WITH SEPARATOR %d DOESN'T HAVE LEFT SUBNODE", node->value->sep_val);
+            return 0;
+        }
+
+        if (!node->right)
+        {
+            WarningMessage(function_name, "NODE WITH SEPARATOR %d DOESN'T HAVE RIGHT SUBNODE", node->value->sep_val);
+            return 0;
+        }
     }
 
     else if (node->val_type == NODE_KEY_TYPE )
@@ -657,7 +657,7 @@ void TreePostorderPrint(const Node* node, FILE* stream)
 
 size_t Format_shift = 0;
 
-static void FprintfNSymb(FILE* stream, char symb, size_t n_symb)
+void FprintfNSymb(FILE* stream, char symb, size_t n_symb)
 {
     ASSERT(stream != nullptr);
 
@@ -665,7 +665,7 @@ static void FprintfNSymb(FILE* stream, char symb, size_t n_symb)
         fprintf(stream, "%c", symb);
 }
 
-static int NodeSdandartPrint(const Node* node, FILE* stream)
+int NodeSdandartPrint(const Node* node, FILE* stream)
 {
     ASSERT(stream != nullptr)
 
@@ -688,7 +688,6 @@ static int NodeSdandartPrint(const Node* node, FILE* stream)
 int WriteTreeInStandartForm(const Node* node, FILE* stream)
 {
     ASSERT(stream != nullptr);
-    ASSERT(node != nullptr);
     VERIFY_NODE(node);
 
     FprintfNSymb(stream, ' ', Format_shift);
@@ -696,6 +695,8 @@ int WriteTreeInStandartForm(const Node* node, FILE* stream)
     fprintf(stream, "{ ");
 
     NodeSdandartPrint(node, stream);
+
+    if (!node) return 1;
 
     if (!(node->left || node->right))
     {

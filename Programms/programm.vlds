@@ -1,23 +1,22 @@
-\\ scanning
+scanf ( init x = 0 , init y = 0 ) ;
+init z = 0 ;
 
-init a = 3 ;
-init b = 4 ;
+printf ( sin ( 1500 ) , cos ( 3141 ) ) ;
 
-
-\\summing
-
-printf ( a + b ) ;
-
-
-\\ powwing
-
-scanf ( a , b ) ;
-
-init pow ( init x , init y )
+init mul ( )
 {
-    return x ^ y ;
+    z = x * y ;
+
+    init pow ( )
+    {
+        z = x ^ y ;
+    }
 }
 
-init powwed = pow ( a , b ) ;
+mul ( ) ;
 
-printf ( powwed ) ;
+printf ( z ) ;
+
+pow ( ) ;
+
+printf ( z ) ;

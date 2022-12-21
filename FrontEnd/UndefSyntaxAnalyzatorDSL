@@ -29,6 +29,10 @@
 #undef LN
 #undef EQ
 
+#undef CheckForLBracket
+#undef CheckForRBracket
+#undef CheckForSemiColon
+
 #endif
 
 #endif

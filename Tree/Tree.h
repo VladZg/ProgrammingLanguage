@@ -65,6 +65,8 @@ void TreePreorderPrint (const Node* node, FILE* stream);
 void TreeInorderPrint  (const Node* node, FILE* stream);
 void TreePostorderPrint(const Node* node, FILE* stream);
 
+void FprintfNSymb(FILE* stream, char symb, size_t n_symb);
+int NodeSdandartPrint(const Node* node, FILE* stream);
 int WriteTreeInStandartForm(const Node* node, FILE* stream);
 
 // int  IsObjectExist(const Node* node, const char* obj_name);

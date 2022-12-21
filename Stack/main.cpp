@@ -1,12 +1,12 @@
-#include "Config.h"
+#include "./Config.h"
 #include <stdio.h>
 // #include <stdlib.h>
 // #include "Log.h"
 // #include "Defines.h"
-#include "Stack.h"
+#include "./Stack.h"
 
-#include "TestingValues.h"
-#include "TestingFunctions.h"
+#include "./TestingValues.h"
+#include "./TestingFunctions.h"
 
 int main()
 {

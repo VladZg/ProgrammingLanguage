@@ -18,6 +18,6 @@
 
 #include "Consts.h"
 
-typedef char* Elem_t;
+typedef int Elem_t;
 
 #endif

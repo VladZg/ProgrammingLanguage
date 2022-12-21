@@ -127,6 +127,18 @@ enum TreeDumpModes
     FULL_FULL_DUMP_MODE,
 };
 
+enum ASMConsts
+{
+    MAX_ASM_CMD_LENGTH = 30,
+    ASM_COMMENT_SHIFT = 31,
+};
+
+enum TranslitModes
+{
+    USUAL_TRANSLIT_MODE,
+    KRYUZHOVNIK_LNG_TRANSLIT_MODE,
+};
+
 // #define TEXT_FOR_PRONOUNCING_FILENAME  "./TextForPronouncing.txt"
 // #define DATABASE_DUMP_HTML_FILENAME    "./DumpInfo/DatabaseDump.html"
 // #define TEXT_FOR_DOT_DUMP_FILENAME     "./DumpInfo/TextForDatabaseDump.dot"

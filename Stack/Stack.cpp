@@ -1,10 +1,10 @@
-#include "Config.h"
+#include "./Config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "HashCounters.h"
-#include "Defines.h"
-#include "Stack.h"
+#include "./HashCounters.h"
+#include "./Defines.h"
+#include "./Stack.h"
 
 
 #ifndef N_HASH_PROTECTION

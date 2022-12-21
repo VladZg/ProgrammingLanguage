@@ -36,7 +36,11 @@ Node* GetFunctionInitParams   (ProgrammTokens* programm_tokens, VarTable* var_ta
 Node* GetFunctionCallParam    (ProgrammTokens* programm_tokens, VarTable* var_table);
 Node* GetFunctionCallParams   (ProgrammTokens* programm_tokens, VarTable* var_table);
 Node* GetFunctionCall         (ProgrammTokens* programm_tokens, VarTable* var_table);
+Node* GetReturnInstruction    (ProgrammTokens* programm_tokens, VarTable* var_table);
 Node* GetNumber               (ProgrammTokens* programm_tokens, VarTable* var_table);
-void CheckForSemiColon        (ProgrammTokens* programm_tokens, VarTable* var_table);
+// void CheckForSemiColon        (ProgrammTokens* programm_tokens, VarTable* var_table);
+
+int IsReturnStatementInFunction(const Node* node);
+
 
 #endif

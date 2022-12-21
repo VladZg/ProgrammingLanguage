@@ -13,7 +13,7 @@
 #define VAL_SEP  CUR_TOKEN->value.sep_val
 #define VAL_VAR  CUR_TOKEN->value.var
 
-#define CREATE_EMPTY CreateNode(NODE_NULL_TYPE, ValueCtor(), left, right)
+#define CREATE_EMPTY CreateNode(NODE_NULL_TYPE, ValueCtor(), nullptr, nullptr)
 
 #define CREATE_OP( node, op_code, left, right )              \
     {                                                        \
@@ -41,5 +41,34 @@
                                                                     \
         node = CreateNode(NODE_NAME_TYPE, value, nullptr, nullptr); \
     }
+
+#define CheckForLBracket                    \
+    if (VAL_TYPE == TOKEN_SEP_TYPE     &&   \
+        VAL_SEP  == SEP_L_ROUND_BRACKET  )  \
+    {                                       \
+        TOKEN_NEXT                          \
+    }                                       \
+                                            \
+    else SYNTAX_ERROR
+
+#define CheckForRBracket                    \
+    if (VAL_TYPE == TOKEN_SEP_TYPE     &&   \
+        VAL_SEP  == SEP_R_ROUND_BRACKET  )  \
+    {                                       \
+        TOKEN_NEXT                          \
+    }                                       \
+                                            \
+    else SYNTAX_ERROR
+
+
+#define CheckForSemiColon                   \
+    if (VAL_TYPE == TOKEN_SEP_TYPE &&       \
+         VAL_SEP  == SEP_SEMI_COLON  )      \
+    {                                       \
+        TOKEN_NEXT                          \
+    }                                       \
+                                            \
+    else SYNTAX_ERROR
+
 
 #endif
