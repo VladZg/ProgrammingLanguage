@@ -65,7 +65,7 @@ int main()
 
     programm.tree = GetProgramm(programm.tokens, programm.var_table);
 
-    ShowTree(programm.tree, SIMPLE_DUMP_MODE, 1);
+    // ShowTree(programm.tree, SIMPLE_DUMP_MODE, 1);
     // ShowTree(programm_tree, FULL_FULL_DUMP_MODE, 1);
 
     // CalculateConstantSubtrees(root);
@@ -79,7 +79,7 @@ int main()
 
     fclose(standartized_tree_file);
 
-    // ProcessProgramm(programm.tree);
+    ProcessProgramm(programm.tree);
 
     ProgrammTokensDtor(&programm.tokens);
     VarTableDtor(&programm.var_table);

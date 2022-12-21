@@ -178,14 +178,14 @@ int TranslateProgrammBodyToAsm(const Node* programm_tree, FILE* asm_file)
                 break;                                                      \
             }
 
-#define IS_COMPRASION (expression->value->op_val == OP_IS_EE ||  \
-                       expression->value->op_val == OP_IS_NE ||  \
-                       expression->value->op_val == OP_IS_GE ||  \
-                       expression->value->op_val == OP_IS_BE ||  \
-                       expression->value->op_val == OP_IS_GT ||  \
-                       expression->value->op_val == OP_IS_BT ||  \
-                       expression->value->op_val == OP_OR    ||  \
-                       expression->value->op_val == OP_AND     )
+#define IS_COMPRASION(expression) (expression->value->op_val == OP_IS_EE ||  \
+                                   expression->value->op_val == OP_IS_NE ||  \
+                                   expression->value->op_val == OP_IS_GE ||  \
+                                   expression->value->op_val == OP_IS_BE ||  \
+                                   expression->value->op_val == OP_IS_GT ||  \
+                                   expression->value->op_val == OP_IS_BT ||  \
+                                   expression->value->op_val == OP_OR    ||  \
+                                   expression->value->op_val == OP_AND     )
 
 int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
 {
@@ -219,12 +219,15 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
 
     else if (expression->val_type == NODE_OP_TYPE)
     {
-        if (IS_COMPRASION)
-        {
-            TranslateComprasionToAsm(expression, asm_file);
-        }
+        // if (IS_COMPRASION                               &&
+        //     expression->prev->val_type == NODE_KEY_TYPE &&
+        //    (expression->prev->value->key_val == KEY_IF  ||
+        //     expression->prev->value->key_val == KEY_ELSE  ))
+        // {
+        //     TranslateComprasionToAsm(expression, asm_file);
+        // }
 
-        else
+        if (!IS_COMPRASION(expression))
         {
             switch (expression->value->op_val)
             {
@@ -250,57 +253,72 @@ int TranslateExpressionToAsm(const Node* expression, FILE* asm_file)
     return 0;
 }
 
-#define VAL_OP comprasion->value->op_val
+#define VAL_OP expression->value->op_val
+#define UNDEF_COMPARATOR {fprintf(stderr, KYEL "UNDEFINED COMPARATOR!!!\n" KNRM); exit(1);}
 
-int TranslateComprasionToAsm(const Node* comprasion, FILE* asm_file)
+int TranslateComprasionToAsm(const Node* expression, FILE* asm_file)
 {
     ASSERT(asm_file != nullptr)
 
-    if (!comprasion) return 0;
+    if (!expression || !expression->left || !expression->right) return 0;
 
-        if (VAL_OP == OP_IS_EE)
+    TranslateExpressionToAsm(expression->left , asm_file);
+    TranslateExpressionToAsm(expression->right, asm_file);
+
+    if (IS_COMPRASION(expression))
     {
+            if (VAL_OP == OP_IS_EE)
+        {
+            ASM_PRINT("JE")
+        }
 
+        else if (VAL_OP == OP_IS_GE)
+        {
+            ASM_PRINT("JASE");
+        }
+
+        else if (VAL_OP == OP_IS_BE)
+        {
+            ASM_PRINT("JJBE");
+        }
+
+        else if (VAL_OP == OP_IS_GT)
+        {
+            ASM_PRINT("JA");
+        }
+
+        else if (VAL_OP == OP_IS_BT)
+        {
+            ASM_PRINT("JB");
+        }
+
+        else if (VAL_OP == OP_IS_NE)
+        {
+            ASM_PRINT("JNE")
+        }
+
+        else if (VAL_OP == OP_OR)
+        {
+            UNDEF_COMPARATOR
+        }
+
+        else if (VAL_OP == OP_AND)
+        {
+            UNDEF_COMPARATOR
+        }
     }
 
-    else if (VAL_OP == OP_IS_GE)
+    else
     {
-
-    }
-
-    else if (VAL_OP == OP_IS_BE)
-    {
-
-    }
-
-    else if (VAL_OP == OP_IS_GT)
-    {
-
-    }
-
-    else if (VAL_OP == OP_IS_BT)
-    {
-
-    }
-
-    else if (VAL_OP == OP_IS_NE)
-    {
-
-    }
-
-    else if (VAL_OP == OP_OR)
-    {
-
-    }
-
-    else if (VAL_OP == OP_AND)
-    {
-
+        ASM_PRINT("PUSH 0\n")
+        ASM_PRINT("JNE");
     }
 
     return 1;
 }
 
+#undef UNDEF_COMPARATOR
+#undef VAL_OP
 #undef IS_COMPRASION
 #undef DEF_OP
 
@@ -398,15 +416,11 @@ int TranslateIfElseToAsm(const Node* instruction, FILE* asm_file, Stack* stack_o
 
     if (!instruction) return 0;
 
-    TranslateExpressionToAsm(instruction->left, asm_file);
-
-    ASM_PRINT("PUSH 0\n")
-
     StackPush(stack_of_calls, (Elem_t) ++N_conditional_construction);
 
-    char asm_if_jmp_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_if_jmp_cmd_str, "JNE :if_block_%d", N_conditional_construction)
-    ASM_COMMENT_PRINT(asm_if_jmp_cmd_str, "\\\\ conditional jump to %d if block", N_conditional_construction)
+    TranslateComprasionToAsm(instruction->left, asm_file);
+
+    ASM_PRINT(" :if_block_%d\n", N_conditional_construction)
 
     if (instruction->right)
     {
@@ -469,14 +483,9 @@ int TranslateWhileToAsm(const Node* instruction, FILE* asm_file, Stack* stack_of
 
     ASM_PRINT("while_%d:\n", N_while_construction)
 
-    TranslateExpressionToAsm(instruction->left, asm_file);
+    TranslateComprasionToAsm(instruction->left, asm_file);
 
-    ASM_PRINT("PUSH 0\n")
-
-    char asm_if_jmp_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_if_jmp_cmd_str, "JNE :while_block_%d", N_while_construction)
-    ASM_COMMENT_PRINT(asm_if_jmp_cmd_str, "\\\\ conditional jump to %d while block", N_while_construction)
-
+    ASM_PRINT(" :while_block_%d\n", N_while_construction)
     ASM_PRINT("JMP :while_else_%d\n\n", N_while_construction)
 
     char asm_while_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};

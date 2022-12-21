@@ -1,31 +1,55 @@
 { ST
-    { VAR
-        { "a" }
-        { IS_GT
-            { 12 }
-            { SUB { 4 } { 33 } }
-        }
-    }
-    { ST
-        { VAR
-            { "b" }
-            { IS_BT
-                { SUB { "a" } { 4 } }
-                { 8 }
+    { IN
+        { PARAM
+            { VAR { "a" } { 0 } }
+            { PARAM
+                { VAR { "b" } { 0 } }
+                { NIL }
             }
         }
-        { ST
-            { IF
-                { IS_EE { "a" } { "b" } }
+        { NIL }
+    }
+    { ST
+        { WHILE
+            { 1 }
+            { ST
+                { WHILE
+                    { IS_BT { "a" } { "b" } }
+                    { ELSE
+                        { ST
+                            { OUT
+                                { PARAM { 3 } { NIL } }
+                                { NIL }
+                            }
+                            { ST
+                                { EQ
+                                    { "a" }
+                                    { ADD { "a" } { 1 } }
+                                }
+                                { NIL }
+                            }
+                        }
+                        { ST
+                            { OUT
+                                { PARAM { 577 } { NIL } }
+                                { NIL }
+                            }
+                            { NIL }
+                        }
+                    }
+                }
                 { ST
-                    { OUT
-                        { PARAM { 999 } { NIL } }
+                    { IN
+                        { PARAM
+                            { "a" }
+                            { PARAM { "b" } { NIL } }
+                        }
                         { NIL }
                     }
                     { NIL }
                 }
             }
-            { NIL }
         }
+        { NIL }
     }
 }

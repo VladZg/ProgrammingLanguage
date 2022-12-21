@@ -14,18 +14,20 @@
 void ErrorPrint(const char* function_name, const char* error_name, size_t token_cursor, Token* token)
 {
     fprintf(stderr, KYEL "%s in the %ld token in \"%s\"!\n" KNRM, error_name, token_cursor, function_name);
-    exit(1);
 }
 
-#define SYNTAX_ERROR ErrorPrint(__PRETTY_FUNCTION__, "Syntax error", programm_tokens->cursor, CUR_TOKEN);
-#define UNKNOWN_NAME_ERROR fprintf(stderr, KYEL "Unknown name \"%s\"", name_node->value->var->name); ErrorPrint(__PRETTY_FUNCTION__, "", programm_tokens->cursor, CUR_TOKEN);
+#define FATAL_ERROR \
+    abort();
+
+#define SYNTAX_ERROR { ErrorPrint(__PRETTY_FUNCTION__, "Syntax error", programm_tokens->cursor, CUR_TOKEN); exit(1); }
+#define UNKNOWN_NAME_ERROR { fprintf(stderr, KYEL "Unknown name \"%s\"", name_node->value->var->name); ErrorPrint(__PRETTY_FUNCTION__, "", programm_tokens->cursor, CUR_TOKEN); exit(1); }
 
 #define UNINITIALIZED_ERROR                                                                         \
 {                                                                                                   \
     fprintf(stderr, KYEL "%s IS UNINITIALIZED!!! DED NE ODOBRYAET... MINUS 10 SOCIAL CREDITS...\n"  \
                     KNRM, initializing_name->value->var->name);                                     \
     ErrorPrint(__PRETTY_FUNCTION__, "", programm_tokens->cursor, CUR_TOKEN);                        \
-    abort();                                                                                        \
+    FATAL_ERROR                                                                                     \
 }
 
 
@@ -542,7 +544,12 @@ Node* GetFunctionCallParam(ProgrammTokens* programm_tokens, VarTable* var_table)
             param = GetFunctionInitParam(programm_tokens, var_table);
         }
 
-        else SYNTAX_ERROR
+        else
+        {
+            fprintf(stderr, KYEL "UNINITIALIZED VARIABLE!!! DED NE ODOBRYAET... MINUS 10 SOCIAL CREDITS...\n" KNRM);
+            ErrorPrint(__PRETTY_FUNCTION__, "", programm_tokens->cursor, CUR_TOKEN);
+            abort();
+        }
     }
 
     else
