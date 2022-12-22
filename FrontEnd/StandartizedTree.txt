@@ -1,106 +1,277 @@
 { ST
-    { FUNC
-        { "rec_fuck"
-            { PARAM
-                { VAR { "n" } { NIL } }
-                { NIL }
-            }
-            { Type }
-        }
-        { ST
-            { IF
-                { IS_BT { "n" } { 1 } }
-                { ELSE
-                    { ST
-                        { EXIT }
-                        { ST
-                            { OUT
-                                { PARAM { 1.33723e+08 } { NIL } }
-                                { NIL }
-                            }
-                            { NIL }
-                        }
-                    }
-                    { ST
-                        { IF
-                            { IS_EE { "n" } { 1 } }
-                            { ELSE
-                                { ST
-                                    { RET { 1 } { NIL } }
-                                    { NIL }
-                                }
-                                { ST
-                                    { RET
-                                        { MUL
-                                            { "n" }
-                                            { CALL
-                                                { "rec_fuck"
-                                                    { PARAM
-                                                        { SUB { "n" } { 1 } }
-                                                        { NIL }
-                                                    }
-                                                    { NIL }
-                                                }
-                                                { NIL }
-                                            }
-                                        }
-                                        { NIL }
-                                    }
-                                    { NIL }
-                                }
-                            }
-                        }
-                        { NIL }
-                    }
-                }
-            }
+    { IN
+        { PARAM
+            { VAR { "a" } { 0 } }
             { NIL }
         }
+        { NIL }
     }
     { ST
         { IN
             { PARAM
-                { VAR { "is_going" } { 1 } }
+                { VAR { "b" } { 0 } }
                 { NIL }
             }
             { NIL }
         }
         { ST
-            { WHILE
-                { IS_NE { "is_going" } { 0 } }
+            { IN
+                { PARAM
+                    { VAR { "c" } { 0 } }
+                    { NIL }
+                }
+                { NIL }
+            }
+            { ST
+                { VAR { "x1" } { 0 } }
                 { ST
-                    { IN
-                        { PARAM
-                            { VAR { "number" } { 0 } }
-                            { NIL }
-                        }
-                        { NIL }
-                    }
+                    { VAR { "x2" } { 0 } }
                     { ST
-                        { OUT
-                            { PARAM
-                                { CALL
-                                    { "rec_fuck"
-                                        { PARAM { "number" } { NIL } }
+                        { VAR { "n_roots" } { 0 } }
+                        { ST
+                            { VAR { "d" } { 0 } }
+                            { ST
+                                { VAR { "sqrt_d" } { 0 } }
+                                { ST
+                                    { FUNC
+                                        { "SquareSolver" { NIL } { Type } }
+                                        { ST
+                                            { EQ { "n_roots" } { 0 } }
+                                            { ST
+                                                { EQ
+                                                    { "d" }
+                                                    { SUB
+                                                        { MUL { "b" } { "b" } }
+                                                        { MUL
+                                                            { MUL { 4 } { "a" } }
+                                                            { "c" }
+                                                        }
+                                                    }
+                                                }
+                                                { ST
+                                                    { IF
+                                                        { IS_EE { "a" } { 0 } }
+                                                        { ELSE
+                                                            { ST
+                                                                { IF
+                                                                    { IS_EE { "b" } { 0 } }
+                                                                    { ELSE
+                                                                        { ST
+                                                                            { IF
+                                                                                { IS_EE { "c" } { 0 } }
+                                                                                { ELSE
+                                                                                    { ST
+                                                                                        { RET { 1.33723e+08 } { NIL } }
+                                                                                        { NIL }
+                                                                                    }
+                                                                                    { ST
+                                                                                        { RET { 0 } { NIL } }
+                                                                                        { NIL }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            { NIL }
+                                                                        }
+                                                                        { ST
+                                                                            { EQ
+                                                                                { "x1" }
+                                                                                { DIV
+                                                                                    { SUB { 0 } { "c" } }
+                                                                                    { "b" }
+                                                                                }
+                                                                            }
+                                                                            { ST
+                                                                                { EQ { "x2" } { "x1" } }
+                                                                                { ST
+                                                                                    { RET { 1 } { NIL } }
+                                                                                    { NIL }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                { NIL }
+                                                            }
+                                                            { ST
+                                                                { EQ
+                                                                    { "sqrt_d" }
+                                                                    { SQRT { "d" } { NIL } }
+                                                                }
+                                                                { ST
+                                                                    { IF
+                                                                        { IS_GT { "d" } { 0 } }
+                                                                        { ELSE
+                                                                            { ST
+                                                                                { EQ
+                                                                                    { "sqrt_d" }
+                                                                                    { SQRT { "d" } { NIL } }
+                                                                                }
+                                                                                { ST
+                                                                                    { EQ
+                                                                                        { "x1" }
+                                                                                        { DIV
+                                                                                            { ADD
+                                                                                                { SUB { 0 } { "b" } }
+                                                                                                { "sqrt_d" }
+                                                                                            }
+                                                                                            { MUL { 2 } { "a" } }
+                                                                                        }
+                                                                                    }
+                                                                                    { ST
+                                                                                        { EQ
+                                                                                            { "x2" }
+                                                                                            { DIV
+                                                                                                { SUB
+                                                                                                    { SUB { 0 } { "b" } }
+                                                                                                    { "sqrt_d" }
+                                                                                                }
+                                                                                                { MUL { 2 } { "a" } }
+                                                                                            }
+                                                                                        }
+                                                                                        { ST
+                                                                                            { RET { 2 } { NIL } }
+                                                                                            { NIL }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            { ST
+                                                                                { IF
+                                                                                    { IS_EE { "d" } { 0 } }
+                                                                                    { ELSE
+                                                                                        { ST
+                                                                                            { EQ
+                                                                                                { "x1" }
+                                                                                                { DIV
+                                                                                                    { SUB { 0 } { "b" } }
+                                                                                                    { MUL { 2 } { "a" } }
+                                                                                                }
+                                                                                            }
+                                                                                            { ST
+                                                                                                { EQ { "x2" } { "x1" } }
+                                                                                                { ST
+                                                                                                    { RET { 1 } { NIL } }
+                                                                                                    { NIL }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        { ST
+                                                                                            { RET { 0 } { NIL } }
+                                                                                            { NIL }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                { NIL }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    { NIL }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    { NIL }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    { ST
+                                        { WHILE
+                                            { 1 }
+                                            { ST
+                                                { EQ
+                                                    { "n_roots" }
+                                                    { CALL { "SquareSolver" } { NIL } }
+                                                }
+                                                { ST
+                                                    { OUT
+                                                        { PARAM { "n_roots" } { NIL } }
+                                                        { NIL }
+                                                    }
+                                                    { ST
+                                                        { IF
+                                                            { IS_EE { "n_roots" } { 0 } }
+                                                            { ELSE
+                                                                { ST
+                                                                    { OUT
+                                                                        { PARAM { 0 } { NIL } }
+                                                                        { NIL }
+                                                                    }
+                                                                    { NIL }
+                                                                }
+                                                                { ST
+                                                                    { IF
+                                                                        { IS_EE { "n_roots" } { 1.33723e+08 } }
+                                                                        { ELSE
+                                                                            { ST
+                                                                                { OUT
+                                                                                    { PARAM { 1.33723e+08 } { NIL } }
+                                                                                    { NIL }
+                                                                                }
+                                                                                { NIL }
+                                                                            }
+                                                                            { ST
+                                                                                { IF
+                                                                                    { IS_EE { "n_roots" } { 1 } }
+                                                                                    { ELSE
+                                                                                        { ST
+                                                                                            { OUT
+                                                                                                { PARAM { "a" } { NIL } }
+                                                                                                { NIL }
+                                                                                            }
+                                                                                            { NIL }
+                                                                                        }
+                                                                                        { ST
+                                                                                            { OUT
+                                                                                                { PARAM
+                                                                                                    { "a" }
+                                                                                                    { PARAM { "b" } { NIL } }
+                                                                                                }
+                                                                                                { NIL }
+                                                                                            }
+                                                                                            { NIL }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                { NIL }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    { NIL }
+                                                                }
+                                                            }
+                                                        }
+                                                        { ST
+                                                            { IN
+                                                                { PARAM { "a" } { NIL } }
+                                                                { NIL }
+                                                            }
+                                                            { ST
+                                                                { IN
+                                                                    { PARAM { "b" } { NIL } }
+                                                                    { NIL }
+                                                                }
+                                                                { ST
+                                                                    { IN
+                                                                        { PARAM { "c" } { NIL } }
+                                                                        { NIL }
+                                                                    }
+                                                                    { NIL }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                         { NIL }
                                     }
-                                    { NIL }
                                 }
-                                { NIL }
                             }
-                            { NIL }
-                        }
-                        { ST
-                            { IN
-                                { PARAM { "is_going" } { NIL } }
-                                { NIL }
-                            }
-                            { NIL }
                         }
                     }
                 }
             }
-            { NIL }
         }
     }
 }

@@ -444,58 +444,61 @@ int TranslateIfElseToAsm(const Node* instruction, FILE* asm_file, Stack* stack_o
 
     if (!instruction) return 0;
 
-    StackPush(stack_of_calls, (Elem_t) ++N_conditional_construction);
-
     TranslateComprasionToAsm(instruction->left, asm_file);
 
-    ASM_PRINT(" :if_block_%d\n", N_conditional_construction)
+    ASM_PRINT(" :if_block_%p\n", instruction)
+
+    // StackPush(stack_of_calls, (Elem_t) ++N_conditional_construction);
+
+    int endif_num = 0;
 
     if (instruction->right)
     {
         if (instruction->right->val_type != NODE_KEY_TYPE ||
             instruction->right->value->key_val != KEY_ELSE  )
         {
-            ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
+            ASM_PRINT("JMP :endif_%p\n\n", instruction)
 
             char asm_if_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-            ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%d:", N_conditional_construction)
+            ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%p:", instruction)
+
             ASM_COMMENT_PRINT(asm_if_block_cmd_str, "\\\\ <-- the beginning ob if block")
             TranslateProgrammBodyToAsm(instruction->right, asm_file);
-            ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
+            ASM_PRINT("JMP :endif_%p\n\n", instruction)
         }
 
         else
         {
-            ASM_PRINT("JMP :else_block_%d\n\n", N_conditional_construction)
+            ASM_PRINT("JMP :else_block_%p\n\n", instruction)
 
             // ShowTree(instruction->right->left, SIMPLE_DUMP_MODE, 1);
 
             char asm_if_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-            ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%d:", N_conditional_construction)
+            ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%p:", instruction)
             ASM_COMMENT_PRINT(asm_if_block_cmd_str, "\\\\ <-- the beginning ob if block")
             TranslateProgrammBodyToAsm(instruction->right->left, asm_file);
-            ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
+            ASM_PRINT("JMP :endif_%p\n\n", instruction)
 
             char asm_else_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-            ASM_CMD_PRINT(asm_else_block_cmd_str, "else_block_%d:", N_conditional_construction)
+            ASM_CMD_PRINT(asm_else_block_cmd_str, "else_block_%p:", instruction)
             ASM_COMMENT_PRINT(asm_else_block_cmd_str, "\\\\ <-- the beginning ob else block")
             TranslateProgrammBodyToAsm(instruction->right->right, asm_file);
-            ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
+            ASM_PRINT("JMP :endif_%p\n\n", instruction)
         }
     }
 
     else
     {
         char asm_if_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-        ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%d:", N_conditional_construction)
+        ASM_CMD_PRINT(asm_if_block_cmd_str, "if_block_%p:", instruction)
         ASM_COMMENT_PRINT(asm_if_block_cmd_str, "\\\\ <-- the beginning ob if block")
-        ASM_PRINT("JMP :endif_%d\n\n", N_conditional_construction)
+        ASM_PRINT("JMP :endif_%p\n\n", instruction)
     }
 
-    int endif_num = (int) StackPop(stack_of_calls);
+    // endif_num = (int) StackPop(stack_of_calls);
 
     char asm_end_of_if_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_end_of_if_block_cmd_str,"endif_%d:", endif_num)
+    ASM_CMD_PRINT(asm_end_of_if_block_cmd_str,"endif_%p:", instruction)
     ASM_COMMENT_PRINT(asm_end_of_if_block_cmd_str, "\\\\ <-- continuation after conditional block")
 
     return 1;
@@ -507,17 +510,17 @@ int TranslateWhileToAsm(const Node* instruction, FILE* asm_file, Stack* stack_of
 
     if (!instruction) return 0;
 
-    StackPush(stack_of_calls, (Elem_t) ++N_while_construction);
+    // StackPush(stack_of_calls, (Elem_t) ++N_while_construction);
 
-    ASM_PRINT("while_%d:\n", N_while_construction)
+    ASM_PRINT("while_%p:\n", instruction)
 
-    TranslateComprasionToAsm(instruction->left, asm_file);
+    if (!TranslateComprasionToAsm(instruction->left, asm_file)) ASM_PRINT("JMP")
 
-    ASM_PRINT(" :while_block_%d\n", N_while_construction)
-    ASM_PRINT("JMP :while_else_%d\n\n", N_while_construction)
+    ASM_PRINT(" :while_block_%p\n", instruction)
+    ASM_PRINT("JMP :while_else_%p\n\n", instruction)
 
     char asm_while_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_while_block_cmd_str, "while_block_%d:", N_while_construction)
+    ASM_CMD_PRINT(asm_while_block_cmd_str, "while_block_%p:", instruction)
     ASM_COMMENT_PRINT(asm_while_block_cmd_str, "\\\\ <-- the beginning ob while block")
 
     if (instruction->right)
@@ -534,12 +537,12 @@ int TranslateWhileToAsm(const Node* instruction, FILE* asm_file, Stack* stack_of
         }
     }
 
-    int while_else_num = (int) StackPop(stack_of_calls);
+    // int while_else_num = (int) StackPop(stack_of_calls);
 
-    ASM_PRINT("JMP :while_%d\n\n", while_else_num)
+    ASM_PRINT("JMP :while_%p\n\n", instruction)
 
     char asm_while_else_block_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_while_else_block_cmd_str,"while_else_%d:", while_else_num)
+    ASM_CMD_PRINT(asm_while_else_block_cmd_str,"while_else_%p:", instruction)
     ASM_COMMENT_PRINT(asm_while_else_block_cmd_str, "\\\\ <-- while else block")
 
     if (instruction->right                            &&
@@ -549,10 +552,10 @@ int TranslateWhileToAsm(const Node* instruction, FILE* asm_file, Stack* stack_of
         TranslateProgrammBodyToAsm(instruction->right->right, asm_file);
     }
 
-    ASM_PRINT("JMP :end_while_%d\n\n", while_else_num)
+    ASM_PRINT("JMP :end_while_%p\n\n", instruction)
 
     char asm_end_of_while_cmd_str[MAX_ASM_CMD_LENGTH] = {};
-    ASM_CMD_PRINT(asm_end_of_while_cmd_str,"end_while_%d:", while_else_num)
+    ASM_CMD_PRINT(asm_end_of_while_cmd_str,"end_while_%p:", instruction)
     ASM_COMMENT_PRINT(asm_end_of_while_cmd_str, "\\\\ <-- continuation after while block")
 
     return 1;
