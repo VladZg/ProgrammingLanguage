@@ -1,0 +1,32 @@
+init mul ( init a , init b )    \\ a function that mulls
+{
+    init result = a * b ;       P.S. just mulling
+
+    return result ;             P.P.S. returning value
+}
+
+init main (  )
+{
+    P.S. scanf ( init x , init y ) ;
+
+    init x = mul ( b , 11 , init c = 7 , 12 + ( c / 3 ) ) ;
+
+    init y = main (  ) ;
+
+    if ( x + 3 / y )                    \\ poshli kak to
+    {
+        P.S. printf ( z ) ;             P.S. pupa i lupa na detsky utrennik...
+        init a = 3 ;                    P.S. no Pupa zabolela
+
+        init z = 2 - 6 ;                     P.P.S. i pupe prishlos pokazyuvat detyam za Lupu
+
+        init abobus ( init x , init y )
+        {
+            return x / y + y / x ;
+        }
+
+        z = abobus ( mul ( a , b ) , 4 ) ;
+    }
+
+    return 1 ;
+}

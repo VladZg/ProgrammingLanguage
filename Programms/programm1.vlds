@@ -1,0 +1,47 @@
+if ( smth )
+{
+    init x = 0 ;
+
+    init mul ( init a , init b )
+    {
+        if ( a - b )
+            x = a ;
+    }
+
+    while ( x - 1 )
+    {
+        x = x - 1 ;
+
+        if ( 3 )
+        {
+            x = x + 10 ;
+
+            if ( 0 ) ;
+            else x = 4 ;
+        }
+        else
+        {
+            y = 10 ;
+
+            if ( mul ( 2 ) )
+            {
+                init z = 14 ;
+                z = 2 + a ;
+            }
+        }
+    }
+}
+
+init a = 4 ;
+init b = mul ( init x = a , 5 ) ;
+
+init just_func ( )
+{
+    b = a ;
+}
+
+just_func ( 34 - 1 / ( a + b ) , init c = 3 ) ;
+
+if ( 1 + b )
+    just_func ( ) + 4 - a ;
+else 1 + 2 ;

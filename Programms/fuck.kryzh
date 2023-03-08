@@ -1,0 +1,30 @@
+\\ FUCKTORIAL ON KRYUZHOVNIK LANGUAGE
+
+obyavit rec_fuck pupa( obyavit n )lupa
+vot
+    esli pupa( n menshe 1 )lupa
+    vot
+        tikaem kanets
+        printf pupa( 133722869 )lupa kanets
+    tak
+
+    inache
+    vot
+        esli pupa( n == 1 )lupa
+        vot
+            return 1 kanets
+        tak
+
+        inache
+        vot
+            vernut n umnojit_na rec_fuck pupa( n vyuchest 1 )lupa kanets
+        tak
+    tak
+tak
+
+poka pupa( 1 )lupa
+vot
+    scanirovat pupa( obyavit number = 0 )lupa  kanets
+
+    napechatat pupa( rec_fuck pupa( number )lupa )lupa kanets
+tak

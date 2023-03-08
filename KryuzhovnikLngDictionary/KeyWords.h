@@ -1,0 +1,11 @@
+//DEF_KEY(key_code, key_name, key_lang_name, key_tree_name)
+
+DEF_KEY(1, WHILE  , "while"  , "WHILE")
+DEF_KEY(2, IF     , "if"     , "IF"   )
+DEF_KEY(3, ELSE   , "else"   , "ELSE" )
+DEF_KEY(4, RETURN , "return" , "RET"  )
+DEF_KEY(5, SCANF  , "scanf"  , "IN"  )
+DEF_KEY(6, PRINTF , "printf" , "OUT"   )
+DEF_KEY(7, INIT   , "init"   , "INIT" )
+DEF_KEY(8, VOID   , "void"   , "Void" )
+DEF_KEY(9, NE_VOID, "ne_void", "Type" )

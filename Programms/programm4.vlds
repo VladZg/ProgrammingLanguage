@@ -1,0 +1,23 @@
+\\ scanning
+
+init a = 3 ;
+init b = 4 ;
+
+
+\\summing
+
+printf ( a + b ) ;
+
+
+\\ powwing
+
+scanf ( a , b ) ;
+
+init pow ( init x , init y )
+{
+    return x ^ y ;
+}
+
+init powwed = pow ( a , b ) ;
+
+printf ( powwed ) ;

@@ -1,0 +1,36 @@
+init start_val = 1000 ;
+init finish_val = 300 ;
+init step = 7 ;
+
+scanf ( init x = 0 ) ;
+
+while ( x )
+{
+    printf ( x ) ;
+
+    scanf ( x ) ;
+}
+
+else
+{
+    if ( 1 )
+    {
+        while ( step )
+        {
+            printf ( step ) ;
+
+            step = step - 1 ;
+        }
+        else
+        {
+            printf ( 1337 ) ;
+        }
+    }
+
+    else
+    {
+        printf ( 14 ) ;
+    }
+}
+
+printf ( 77777 ) ;
