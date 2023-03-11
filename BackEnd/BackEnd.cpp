@@ -44,17 +44,16 @@ int  PrintInAsm(FILE* asm_file, const char* fmt_text, ...)
 
 int ProcessProgramm(const Node* programm_tree)
 {
-    FILE* asm_file = fopen("./Programms/Source.txt", "w");
+    FILE* asm_file = fopen("./Processor/Source.asm", "w");
     ASSERT(asm_file != nullptr)
 
     TranslateProgrammTreeToAsm(programm_tree, asm_file);
 
     fclose(asm_file);
 
-    system("cd ./Processor                      ;"
-           "./asm ../Programms/Source.txt       ;"
-           "./cpu ../Programms/Source_output.asm;"
-           "cd ../                              ;");
+    system("cd ./Processor                    ;"
+        //    "make -f Run filename=./Source.asm ;"
+           "cd ../                            ;");
    ;
     return 1;
 }
