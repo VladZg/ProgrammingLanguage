@@ -52,7 +52,8 @@ int ProcessProgramm(const Node* programm_tree)
     fclose(asm_file);
 
     system("cd ./Processor                    ;"
-        //    "make -f Run filename=./Source.asm ;"
+           "make -f Run clean                 ;"
+           "make -f Run filename=./Source.asm ;"
            "cd ../                            ;");
    ;
     return 1;
